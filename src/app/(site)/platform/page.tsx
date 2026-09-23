@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
+import ScienceFigure from "@/components/science/ScienceFigure";
+import type { IllustrationName } from "@/components/science/Illustrations";
 import {
   PLATFORM_PRODUCTS,
   PLATFORM_PIPELINES,
@@ -17,15 +19,13 @@ function PlatformCard({
   slug,
   title,
   summary,
-  image,
-  imageAlt,
+  art,
   num,
 }: {
   slug: string;
   title: string;
   summary: string;
-  image: string;
-  imageAlt: string;
+  art: IllustrationName;
   num: string;
 }) {
   return (
@@ -33,23 +33,7 @@ function PlatformCard({
       href={`/platform/${slug}`}
       className="group relative bg-cream-100 p-8 md:p-10 transition-colors duration-500 hover:bg-cream-50"
     >
-      <div className="relative mb-8 aspect-[16/10] overflow-hidden rounded-2xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image}
-          alt={imageAlt}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(26,26,26,0) 60%, rgba(26,26,26,0.24) 100%)",
-          }}
-        />
-      </div>
+      <ScienceFigure name={art} description="" className="mb-8 h-48 md:h-56 bg-cream-50 transition-transform duration-700 group-hover:-translate-y-1" />
 
       <div className="flex items-baseline gap-4 mb-6">
         <span className="kicker text-navy/70">{num}</span>
@@ -76,10 +60,10 @@ function PlatformCard({
 }
 
 export default function PlatformPage() {
-  let n = 0;
   return (
     <main className="relative">
       <PageHeader
+        crumbs={[{ label: "Platform" }]}
         eyebrow="Platform"
         title={
           <>
@@ -94,20 +78,16 @@ export default function PlatformPage() {
         <div className="mx-auto max-w-[1400px] px-6 md:px-10">
           <div className="kicker mb-8">Products</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-black/5 border border-black/5">
-            {PLATFORM_PRODUCTS.map((p) => {
-              n += 1;
-              return (
-                <PlatformCard
-                  key={p.slug}
-                  slug={p.slug}
-                  title={p.title}
-                  summary={p.summary}
-                  image={p.image}
-                  imageAlt={p.imageAlt}
-                  num={String(n).padStart(2, "0")}
-                />
-              );
-            })}
+            {PLATFORM_PRODUCTS.map((p, i) => (
+              <PlatformCard
+                key={p.slug}
+                slug={p.slug}
+                title={p.title}
+                summary={p.summary}
+                art={p.art}
+                num={String(i + 1).padStart(2, "0")}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -118,20 +98,16 @@ export default function PlatformPage() {
         <div className="mx-auto max-w-[1400px] px-6 md:px-10">
           <div className="kicker mb-8">Named pipeline</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-black/5 border border-black/5">
-            {PLATFORM_PIPELINES.map((p) => {
-              n += 1;
-              return (
-                <PlatformCard
-                  key={p.slug}
-                  slug={p.slug}
-                  title={p.title}
-                  summary={p.summary}
-                  image={p.image}
-                  imageAlt={p.imageAlt}
-                  num={String(n).padStart(2, "0")}
-                />
-              );
-            })}
+            {PLATFORM_PIPELINES.map((p, i) => (
+              <PlatformCard
+                key={p.slug}
+                slug={p.slug}
+                title={p.title}
+                summary={p.summary}
+                art={p.art}
+                num={String(i + 1).padStart(2, "0")}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -142,20 +118,16 @@ export default function PlatformPage() {
         <div className="mx-auto max-w-[1400px] px-6 md:px-10">
           <div className="kicker mb-8">Computational toolkit</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-black/5 border border-black/5">
-            {PLATFORM_TOOLKITS.map((p) => {
-              n += 1;
-              return (
-                <PlatformCard
-                  key={p.slug}
-                  slug={p.slug}
-                  title={p.title}
-                  summary={p.summary}
-                  image={p.image}
-                  imageAlt={p.imageAlt}
-                  num={String(n).padStart(2, "0")}
-                />
-              );
-            })}
+            {PLATFORM_TOOLKITS.map((p, i) => (
+              <PlatformCard
+                key={p.slug}
+                slug={p.slug}
+                title={p.title}
+                summary={p.summary}
+                art={p.art}
+                num={String(i + 1).padStart(2, "0")}
+              />
+            ))}
           </div>
 
           <div className="mt-16 border-t border-black/10 pt-10 flex flex-wrap items-center justify-between gap-6">

@@ -2,7 +2,36 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import ScienceFigure from "@/components/science/ScienceFigure";
+import type { IllustrationName } from "@/components/science/Illustrations";
 import { SERVICES } from "@/lib/services-data";
+
+const TEASER_FIGURES: {
+  name: IllustrationName;
+  label: string;
+  description: string;
+}[] = [
+  {
+    name: "antibodyAntigen",
+    label: "Discovery",
+    description: "Antibody engaging an antigen at its Fab tips",
+  },
+  {
+    name: "dockingPoses",
+    label: "Docking",
+    description: "Candidate ligand poses ranked within a binding pocket",
+  },
+  {
+    name: "trajectoryMotion",
+    label: "Simulation",
+    description: "A complex drifting from its starting frame over a trajectory",
+  },
+  {
+    name: "sequencingReads",
+    label: "Genomics",
+    description: "Sequencing reads aligned to a reference with a variant marked",
+  },
+];
 
 /**
  * Condensed teaser for the /services hub — full descriptions live on the
@@ -30,8 +59,9 @@ export default function Services() {
               <span className="italic text-navy">engineered.</span>
             </h2>
             <p className="mt-5 text-ink-soft text-[1.02rem] leading-[1.6] max-w-[38ch]">
-              Libraries, discovery, engineering, and AI-driven data, deployed
-              as a pipeline, a program, or a standalone engagement.
+              Antibody libraries and discovery, structural and simulation
+              science, genomics and biomarkers — deployed as a pipeline, a
+              program, or a standalone engagement.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -52,29 +82,23 @@ export default function Services() {
             </Link>
           </motion.div>
 
-          {/* Supporting visual — a physical model of a protein complex, makes "structure" tangible */}
+          {/* Supporting visual — four of the schematics from the service
+              pages, so the breadth of the work reads at a glance. */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="lg:col-span-7 relative aspect-[16/10] overflow-hidden rounded-2xl border border-black/5"
+            className="lg:col-span-7 grid grid-cols-2 gap-px bg-black/5 border border-black/5 rounded-2xl overflow-hidden"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://images.unsplash.com/photo-1707863080685-177f4f6e850d?auto=format&fit=crop&q=80&w=2000"
-              alt="Physical model of a multi-chain protein complex surface structure"
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(26,26,26,0) 60%, rgba(26,26,26,0.28) 100%)",
-              }}
-            />
+            {TEASER_FIGURES.map((f) => (
+              <div key={f.name} className="bg-cream-100 p-5 md:p-7">
+                <ScienceFigure name={f.name} description={f.description} />
+                <div className="mt-4 text-[0.68rem] tracking-[0.12em] uppercase text-ink-muted">
+                  {f.label}
+                </div>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>

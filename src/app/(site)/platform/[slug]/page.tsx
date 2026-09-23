@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/PageHeader";
+import ScienceFigure from "@/components/science/ScienceFigure";
 import { PLATFORM, getPlatformEntry } from "@/lib/platform-data";
 
 export function generateStaticParams() {
@@ -30,40 +31,31 @@ export default function PlatformDetailPage({
   if (!entry) notFound();
 
   const others = PLATFORM.filter((p) => p.slug !== entry.slug);
+  const cut = entry.description.indexOf(". ");
+  const lead = cut > 0 ? entry.description.slice(0, cut + 1) : entry.description;
+  const rest = cut > 0 ? entry.description.slice(cut + 2) : "";
 
   return (
     <main className="relative">
       <PageHeader
+        crumbs={[{ label: "Platform", href: "/platform" }, { label: entry.title }]}
         eyebrow={entry.kindLabel}
         title={entry.title}
         lede={entry.summary}
+        aside={<ScienceFigure name={entry.art} description={entry.artDescription} className="p-8 md:p-10" />}
       />
 
       <section className="pb-20 md:pb-28">
         <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-          <div className="relative mb-14 md:mb-20 aspect-[21/8] overflow-hidden rounded-2xl border border-black/5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={entry.image}
-              alt={entry.imageAlt}
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(26,26,26,0) 60%, rgba(26,26,26,0.28) 100%)",
-              }}
-            />
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-8">
-              <p className="text-ink-soft text-[1.06rem] md:text-[1.12rem] leading-[1.7]">
-                {entry.description}
+              {/* Lead sentence set large; the rest keeps its (deliberately hedged) detail. */}
+              <p className="font-display text-ink text-[1.25rem] md:text-[1.55rem] leading-[1.3] tracking-tight">
+                {lead}
               </p>
+              {rest && (
+                <p className="mt-5 text-ink-soft text-[1rem] leading-[1.7]">{rest}</p>
+              )}
 
               {/* Product capability list */}
               {entry.capabilities && entry.capabilities.length > 0 && (
@@ -108,22 +100,22 @@ export default function PlatformDetailPage({
               {entry.stages && entry.stages.length > 0 && (
                 <div className="mt-12">
                   <div className="kicker mb-5">Pipeline stages</div>
-                  <ol className="space-y-5">
-                    {entry.stages.map((s, i) => (
-                      <li key={s.title} className="flex gap-4">
-                        <span className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-navy/10 text-navy text-[0.8rem] font-medium">
-                          {i + 1}
-                        </span>
-                        <div>
-                          <div className="text-ink font-medium mb-1">
-                            {s.title}
-                          </div>
-                          <p className="text-ink-soft text-[0.92rem] leading-[1.55]">
-                            {s.body}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
+                  <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {entry.stages.map((s, i) => {
+                      const planned = /planned/i.test(s.title);
+                      return (
+                        <li
+                          key={s.title}
+                          className={`rounded-2xl border p-5 ${planned ? "border-dashed border-black/20 bg-transparent" : "border-black/[0.06] bg-cream-50"}`}
+                        >
+                          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[0.72rem] font-medium tabular-nums ${planned ? "border border-black/20 text-ink-muted" : "bg-navy text-cream-100"}`}>
+                            {i + 1}
+                          </span>
+                          <div className="mt-4 font-display text-[1.08rem] leading-tight tracking-tightest text-ink">{s.title}</div>
+                          <p className="mt-1.5 text-ink-soft text-[0.86rem] leading-[1.5]">{s.body}</p>
+                        </li>
+                      );
+                    })}
                   </ol>
                 </div>
               )}
@@ -142,9 +134,9 @@ export default function PlatformDetailPage({
               {entry.toolCategories && entry.toolCategories.length > 0 && (
                 <div className="mt-12">
                   <div className="kicker mb-5">Capability catalog</div>
-                  <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {entry.toolCategories.map((cat) => (
-                      <div key={cat.category}>
+                      <div key={cat.category} className="rounded-2xl border border-black/[0.06] bg-cream-50 p-5">
                         <div className="text-[0.72rem] tracking-[0.1em] uppercase text-navy/70 mb-3">
                           {cat.category}
                         </div>

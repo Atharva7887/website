@@ -24,6 +24,15 @@ body {
   color: var(--ink);
   overflow-x: hidden;
 }
+/* `clip` crops the off-canvas decorative orbs without making body a scroll
+   container — with `hidden`, an in-page #anchor jump could scroll the whole
+   page sideways. */
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
 
 html {
   scroll-behavior: smooth;
@@ -102,7 +111,12 @@ body {
   transform: translateY(0);
 }
 
-/* Magnetic CTA */
+/* Magnetic CTA.
+   These live in @layer components so Tailwind utilities beat them. Defined
+   as plain CSS they were winning on source order instead, which made
+   `hidden lg:inline-flex cta` visible on mobile and turned every
+   `kicker text-navy/70` back to muted grey. */
+@layer components {
 .cta {
   position: relative;
   display: inline-flex;
@@ -186,6 +200,7 @@ body {
   color: var(--ink-muted);
   font-weight: 500;
 }
+}
 
 /* Team card hover interaction.
    Only the image scales — name, role, and bio stay fully visible at all
@@ -212,5 +227,93 @@ body {
 /* ─── Section transitions ─── */
 section {
   position: relative;
+}
+
+/* ─── Scientific illustration motion ───
+   Small, looping, and purposeful: each one demonstrates the concept its
+   figure is explaining. Pure CSS so the diagrams cost no JavaScript. */
+.sci-drift {
+  animation: sciDrift 6s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes sciDrift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(7px, -5px) rotate(2.2deg); }
+  50% { transform: translate(-4px, 6px) rotate(-1.8deg); }
+  75% { transform: translate(6px, 3px) rotate(1.2deg); }
+}
+
+.sci-pulse {
+  animation: sciPulse 2.8s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes sciPulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+.sci-trace {
+  stroke-dasharray: 5 7;
+  animation: sciTrace 2.2s linear infinite;
+}
+@keyframes sciTrace {
+  to { stroke-dashoffset: -24; }
+}
+
+/* Marker sampling the trajectory. Coordinates follow the curve it rides. */
+.sci-travel {
+  animation: sciTravel 7s ease-in-out infinite;
+}
+@keyframes sciTravel {
+  0%   { transform: translate(24px, 126px); }
+  12%  { transform: translate(48px, 118px); }
+  25%  { transform: translate(72px, 120px); }
+  37%  { transform: translate(94px, 113px); }
+  50%  { transform: translate(116px, 118px); }
+  62%  { transform: translate(138px, 112px); }
+  75%  { transform: translate(160px, 116px); }
+  87%  { transform: translate(188px, 110px); }
+  100% { transform: translate(216px, 112px); }
+}
+
+.sci-approach {
+  animation: sciApproach 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+}
+@keyframes sciApproach {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-22px, 12px); }
+}
+
+/* ─── Reduced motion ───
+   Scroll-reveals land in their final state, and the decorative loops
+   (divider shimmer, float) stop. Framer Motion components opt out
+   separately via useReducedMotion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .divider::after,
+  .animate-float-slow,
+  .animate-fade-in,
+  .sci-drift,
+  .sci-pulse,
+  .sci-trace,
+  .sci-travel,
+  .sci-approach {
+    animation: none;
+  }
+  /* Park the trajectory marker on the curve so the figure still reads as a
+     complete diagram rather than a dot stranded at the origin. */
+  .sci-travel {
+    transform: translate(116px, 118px);
+  }
+  .sci-pulse {
+    opacity: 1;
+  }
 }
 

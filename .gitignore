@@ -50,3 +50,10 @@ yarn-error.log*
 
 # Sanity build artifacts
 /dist/
+
+# Cloudflare (OpenNext / Wrangler)
+/.open-next/
+/.wrangler/
+.dev.vars
+.dev.vars.*
+cloudflare-env.d.ts

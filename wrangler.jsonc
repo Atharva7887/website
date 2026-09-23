@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "indiskaai-website",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-21",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    // Self-reference so OpenNext can invoke this same Worker for
+    // background cache revalidation. Binding name must stay
+    // WORKER_SELF_REFERENCE; `service` must match `name` above.
+    // https://opennext.js.org/cloudflare/caching
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "indiskaai-website"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  // Public, non-secret site config. Values here are baked into the deployed
+  // Worker; set the same keys via `wrangler secret put` only if they ever
+  // need to be private. See .env.example for what these do.
+  "vars": {
+    "NEXT_PUBLIC_SANITY_DATASET": "production"
+  }
+}

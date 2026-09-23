@@ -5,41 +5,59 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CORE_SERVICES, ENGAGEMENT_MODELS } from "@/lib/services-data";
+import { SERVICE_GROUPS, servicesInGroup } from "@/lib/services-data";
 import { PLATFORM } from "@/lib/platform-data";
+
+type NavItem = { label: string; href: string };
+
+/** An optionally-titled block of links inside a dropdown. */
+type NavGroup = { label?: string; items: NavItem[] };
 
 type NavLink = {
   label: string;
   href: string;
-  children?: { label: string; href: string }[];
-  /** Rendered after a divider, below `children`, under `secondaryGroupLabel`. */
-  secondaryChildren?: { label: string; href: string }[];
-  secondaryGroupLabel?: string;
+  groups?: NavGroup[];
   /** Bottom "view all" link text in the dropdown. Defaults to `label`. */
   viewAllLabel?: string;
 };
 
 const links: NavLink[] = [
+  { label: "Home", href: "/" },
   {
     label: "Services",
     href: "/services",
-    children: CORE_SERVICES.map((s) => ({ label: s.title, href: `/services/${s.slug}` })),
-    secondaryChildren: ENGAGEMENT_MODELS.map((s) => ({ label: s.title, href: `/services/${s.slug}` })),
-    secondaryGroupLabel: "Engagement model",
+    groups: SERVICE_GROUPS.map((g) => ({
+      label: g.label,
+      items: servicesInGroup(g.id).map((s) => ({
+        label: s.title,
+        href: `/services/${s.slug}`,
+      })),
+    })),
     viewAllLabel: "See all services",
   },
   {
     label: "Platform",
     href: "/platform",
-    children: PLATFORM.map((p) => ({ label: p.title, href: `/platform/${p.slug}` })),
+    groups: [
+      {
+        items: PLATFORM.map((p) => ({
+          label: p.title,
+          href: `/platform/${p.slug}`,
+        })),
+      },
+    ],
     viewAllLabel: "See all of platform",
   },
   {
     label: "About Us",
     href: "/#about",
-    children: [
-      { label: "Team", href: "/team" },
-      { label: "Future", href: "/future" },
+    groups: [
+      {
+        items: [
+          { label: "Team", href: "/team" },
+          { label: "Future", href: "/future" },
+        ],
+      },
     ],
     viewAllLabel: "About IndiskaAI",
   },
@@ -56,8 +74,9 @@ function isActive(pathname: string, href: string) {
 /** A parent nav item reads as active if the current page is one of its children too (e.g. /team under About Us). */
 function isActiveGroup(pathname: string, link: NavLink) {
   if (isActive(pathname, link.href)) return true;
-  const all = [...(link.children ?? []), ...(link.secondaryChildren ?? [])];
-  return all.some((c) => isActive(pathname, c.href));
+  return (link.groups ?? []).some((g) =>
+    g.items.some((c) => isActive(pathname, c.href))
+  );
 }
 
 export default function Nav({ careersStatus }: { careersStatus?: string }) {
@@ -103,11 +122,11 @@ export default function Nav({ careersStatus }: { careersStatus?: string }) {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-9 lg:flex">
+        <ul className="hidden items-center gap-7 xl:gap-9 lg:flex">
           {links.map((l) => {
             const active = isActiveGroup(pathname, l);
             const showBadge = l.label === "Careers" && !!careersStatus;
-            const hasChildren = !!l.children?.length;
+            const hasChildren = !!l.groups?.length;
 
             return (
               <li
@@ -163,23 +182,20 @@ export default function Nav({ careersStatus }: { careersStatus?: string }) {
                         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                         className="absolute left-0 top-full pt-3"
                       >
-                        <div className="w-64 rounded-2xl border border-black/5 bg-cream-50 p-2 shadow-[0_24px_60px_-30px_rgba(26,26,26,0.35)]">
-                          {l.children!.map((c) => (
-                            <Link
-                              key={c.href}
-                              href={c.href}
-                              className="block rounded-xl px-4 py-2.5 text-[0.88rem] text-ink-soft transition-colors hover:bg-cream-200/70 hover:text-ink"
+                        <div className="w-72 max-h-[70vh] overflow-y-auto rounded-2xl border border-black/5 bg-cream-50 p-2 shadow-[0_24px_60px_-30px_rgba(26,26,26,0.35)]">
+                          {l.groups!.map((g, gi) => (
+                            <div
+                              key={g.label ?? gi}
+                              className={
+                                gi > 0 ? "mt-1 border-t border-black/5 pt-1" : ""
+                              }
                             >
-                              {c.label}
-                            </Link>
-                          ))}
-
-                          {!!l.secondaryChildren?.length && (
-                            <div className="mt-1 border-t border-black/5 pt-1">
-                              <div className="px-4 pt-1.5 pb-1 text-[0.68rem] tracking-[0.1em] uppercase text-ink-muted">
-                                {l.secondaryGroupLabel}
-                              </div>
-                              {l.secondaryChildren.map((c) => (
+                              {g.label && (
+                                <div className="px-4 pt-1.5 pb-1 text-[0.68rem] tracking-[0.1em] uppercase text-ink-muted">
+                                  {g.label}
+                                </div>
+                              )}
+                              {g.items.map((c) => (
                                 <Link
                                   key={c.href}
                                   href={c.href}
@@ -189,7 +205,7 @@ export default function Nav({ careersStatus }: { careersStatus?: string }) {
                                 </Link>
                               ))}
                             </div>
-                          )}
+                          ))}
 
                           <div className="mt-1 border-t border-black/5 pt-1">
                             <Link
@@ -261,7 +277,7 @@ export default function Nav({ careersStatus }: { careersStatus?: string }) {
             >
               {links.map((l) => {
                 const showBadge = l.label === "Careers" && !!careersStatus;
-                const hasChildren = !!l.children?.length;
+                const hasChildren = !!l.groups?.length;
                 const sectionOpen = openMobileSection === l.label;
 
                 return (
@@ -322,35 +338,28 @@ export default function Nav({ careersStatus }: { careersStatus?: string }) {
                             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             className="overflow-hidden pl-4 mt-2 flex flex-col gap-3 border-l border-black/10"
                           >
-                            {l.children!.map((c) => (
-                              <li key={c.href}>
-                                <Link
-                                  href={c.href}
-                                  className="text-[0.95rem] text-ink-soft"
-                                  onClick={() => setOpen(false)}
-                                >
-                                  {c.label}
-                                </Link>
+                            {l.groups!.map((g, gi) => (
+                              <li key={g.label ?? gi}>
+                                {g.label && (
+                                  <div className="text-[0.68rem] tracking-[0.1em] uppercase text-ink-muted mb-2 pt-1">
+                                    {g.label}
+                                  </div>
+                                )}
+                                <ul className="flex flex-col gap-3">
+                                  {g.items.map((c) => (
+                                    <li key={c.href}>
+                                      <Link
+                                        href={c.href}
+                                        className="text-[0.95rem] text-ink-soft"
+                                        onClick={() => setOpen(false)}
+                                      >
+                                        {c.label}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
                               </li>
                             ))}
-                            {!!l.secondaryChildren?.length && (
-                              <>
-                                <li className="text-[0.68rem] tracking-[0.1em] uppercase text-ink-muted pt-1">
-                                  {l.secondaryGroupLabel}
-                                </li>
-                                {l.secondaryChildren.map((c) => (
-                                  <li key={c.href}>
-                                    <Link
-                                      href={c.href}
-                                      className="text-[0.95rem] text-ink-soft"
-                                      onClick={() => setOpen(false)}
-                                    >
-                                      {c.label}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </>
-                            )}
                           </motion.ul>
                         )}
                       </AnimatePresence>

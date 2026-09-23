@@ -3,6 +3,10 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import TextReveal from "@/components/TextReveal";
+import ScienceFigure from "@/components/science/ScienceFigure";
+import type { IllustrationName } from "@/components/science/Illustrations";
+
+const STAGE_ART: IllustrationName[] = ["epitopeMap", "dockingPoses", "deNovoDesign", "leadOptimization", "developmentPipeline"];
 
 const stages = [
   {
@@ -74,23 +78,18 @@ export default function Approach() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mb-20 md:mb-28 aspect-[21/9] overflow-hidden rounded-2xl border border-black/5"
+          className="mb-20 md:mb-28 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+          role="img"
+          aria-label="Five schematic stages: epitope mapping, docking, candidate generation, variant optimisation, and development handoff"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://images.unsplash.com/photo-1766297248160-87aca6fa59ef?auto=format&fit=crop&q=80&w=2000"
-            alt="Scientist reviewing structural imaging data across dual monitors"
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(26,26,26,0) 60%, rgba(26,26,26,0.28) 100%)",
-            }}
-          />
+          {STAGE_ART.map((name, i) => (
+            <div key={name} className={`relative ${i === 4 ? "hidden sm:block" : ""}`}>
+              <ScienceFigure name={name} description="" className="aspect-[3/2]" />
+              <span className="absolute left-3 top-3 rounded-full bg-ink px-2 py-0.5 text-[0.6rem] font-medium tabular-nums text-cream-100">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+          ))}
         </motion.div>
 
         {/* Timeline */}

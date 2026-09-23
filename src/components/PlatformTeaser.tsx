@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { PLATFORM } from "@/lib/platform-data";
+import ScienceFigure from "@/components/science/ScienceFigure";
 
 /**
  * Homepage teaser for the Platform section — products, the named
@@ -22,23 +23,29 @@ export default function PlatformTeaser() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 lg:order-1 relative aspect-[16/10] overflow-hidden rounded-2xl border border-black/5"
+            className="lg:col-span-7 lg:order-1 overflow-hidden rounded-2xl border border-black/10 bg-cream-50 shadow-[0_30px_70px_-45px_rgba(16,53,101,0.55)]"
+            role="img"
+            aria-label="Schematic of a structure-analysis workspace: an antibody–antigen complex beside a residue contact map and metric traces"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=2000"
-              alt="Glowing golden particle rendering of a DNA double helix"
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(26,26,26,0) 60%, rgba(26,26,26,0.28) 100%)",
-              }}
-            />
+            {/* Product-style workspace, drawn from our own schematics rather than a stock photo. */}
+            <div className="flex items-center gap-2 border-b border-black/5 bg-cream-100 px-4 py-2.5">
+              <span className="h-2 w-2 rounded-full bg-black/15" />
+              <span className="h-2 w-2 rounded-full bg-black/15" />
+              <span className="h-2 w-2 rounded-full bg-gold" />
+              <span className="ml-2 text-[0.64rem] tracking-[0.12em] uppercase text-ink-muted">Workspace · schematic</span>
+            </div>
+            <div className="grid grid-cols-12">
+              <div aria-hidden className="col-span-3 hidden sm:flex flex-col gap-1.5 border-r border-black/5 p-3">
+                {["Contacts", "CDRs", "Epitope", "Clustering", "QC"].map((t, i) => (
+                  <span key={t} className={`rounded-md px-2 py-1.5 text-[0.7rem] ${i === 2 ? "bg-navy/10 text-navy" : "text-ink-muted"}`}>{t}</span>
+                ))}
+              </div>
+              <div className="col-span-12 sm:col-span-9 grid grid-cols-2 gap-px bg-black/5">
+                <div className="bg-cream-50 p-4"><ScienceFigure name="antibodyAntigen" description="" padded={false} className="aspect-[3/2] border-0 bg-transparent" /></div>
+                <div className="bg-cream-50 p-4"><ScienceFigure name="interfaceMap" description="" padded={false} className="aspect-[3/2] border-0 bg-transparent" /></div>
+                <div className="col-span-2 bg-cream-50 p-4"><ScienceFigure name="contactPersistence" description="" padded={false} className="aspect-[5/1] border-0 bg-transparent" /></div>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div

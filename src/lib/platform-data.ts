@@ -1,3 +1,5 @@
+import type { IllustrationName } from "@/components/science/Illustrations";
+
 /**
  * IndiskaAI's software products, named pipelines, and computational
  * toolkit — distinct from the antibody library/discovery services in
@@ -37,8 +39,8 @@ export type PlatformEntry = {
   summary: string;
   /** Main descriptive paragraph(s) on the detail page. */
   description: string;
-  image: string;
-  imageAlt: string;
+  art: IllustrationName;
+  artDescription: string;
   capabilities?: string[];
   stages?: PlatformStage[];
   programs?: PlatformProgram[];
@@ -54,9 +56,8 @@ export const PLATFORM: PlatformEntry[] = [
     kindLabel: "Product",
     summary:
       "A one-click, mostly-offline application for antibody structure and interaction analysis.",
-    image:
-      "https://images.unsplash.com/photo-1628595351029-c2bf17511435?auto=format&fit=crop&q=80&w=1600",
-    imageAlt: "DNA double-helix render on a dark navy background",
+    art: "antibodyAntigen",
+    artDescription: "Antibody engaging an antigen at its Fab tips, the kind of complex Structure Suite analyses",
     description:
       "IndiskaAI Structure Suite is a one-click, mostly-offline desktop and web application for antibody structure and interaction analysis. It runs entirely on the local machine except for two capabilities that reach the internet: fetching a structure by PDB ID, and an optional AI-assisted insights panel.",
     capabilities: [
@@ -84,9 +85,8 @@ export const PLATFORM: PlatformEntry[] = [
     kindLabel: "Product",
     summary:
       "A single REST API wrapping a suite of sequence and structure design models.",
-    image:
-      "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?auto=format&fit=crop&q=80&w=1600",
-    imageAlt: "Two scientists reviewing computational data on monitors",
+    art: "sequenceToStructure",
+    artDescription: "A sequence resolving into a predicted structure, as the design models behind the API do",
     description:
       "Our Antibody Engineering Platform exposes a suite of sequence and structure design models behind a single REST API, distinct from Structure Suite's analysis and QC focus. It wraps ProteinMPNN, LigandMPNN, AntiFold, Boltz, ESM3, IgLM, AbLang, and Arpeggio-style contact extraction, plus CD-HIT, MMseqs2, and Clustal Omega clustering and an ANARCI numbering endpoint, so design and scoring workflows can be built on top of one consistent interface.",
     capabilities: [
@@ -106,9 +106,8 @@ export const PLATFORM: PlatformEntry[] = [
     kindLabel: "Product",
     summary:
       "Combinatorial mutation generation and large-scale developability scoring.",
-    image:
-      "https://images.unsplash.com/photo-1707863080685-177f4f6e850d?auto=format&fit=crop&q=80&w=1600",
-    imageAlt: "Physical model of a multi-chain protein complex surface structure",
+    art: "mutationVariant",
+    artDescription: "Wild-type and variant sequences compared at a single mutated position",
     description:
       "MutantGen Platform generates combinatorial antibody sequence mutations and screens millions of resulting variants through multi-threaded biochemical filtering (pI, GRAVY, Levenshtein distance), then ranks them with a large-scale ESM-1v and Random Forest developability and ΔΔG scorer. It runs alongside Structure Suite's own Mutation Engineering capability as a separate, higher-throughput tool for exploring much larger variant spaces.",
     capabilities: [
@@ -126,9 +125,8 @@ export const PLATFORM: PlatformEntry[] = [
     kindLabel: "Named Pipeline",
     summary:
       "Computational affinity maturation: starting from a validated parent antibody, not from nothing.",
-    image:
-      "https://images.unsplash.com/photo-1624957485560-47747511b32f?auto=format&fit=crop&q=80&w=1600",
-    imageAlt: "Scientist holding a multi-well screening plate up to the light",
+    art: "leadOptimization",
+    artDescription: "A parent antibody diversified into scored variants, with the best-ranked carried forward",
     description:
       "This is not de novo generation. The pipeline starts from an existing, phage-display-validated antibody and computationally diversifies its light chain to find improved binders, closer in spirit to AI-driven lead optimization than to designing a binder from scratch. The same target-agnostic codebase has been rearchitected across five generations (v2 through v6) rather than forked per target; version 5 identified and corrected a real scoring bias in an earlier ML component along the way.",
     programs: [
@@ -162,9 +160,8 @@ export const PLATFORM: PlatformEntry[] = [
     kindLabel: "Computational Toolkit",
     summary:
       "Epitope-targeted generation of new binders where no starting antibody exists.",
-    image:
-      "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=1600",
-    imageAlt: "Glowing golden particle rendering of a DNA double helix",
+    art: "deNovoDesign",
+    artDescription: "A target epitope feeding a generative model that proposes candidate binders",
     description:
       "Where the lead-optimization pipeline improves an existing antibody, this toolkit designs new binders against a specified epitope with no starting sequence at all. Its verified, actively-maintained anchor is Germinal: a three-step process (hallucination via ColabDesign, selective sequence redesign via AbMPNN, and cofolding against the target via AlphaFold3, Chai, or Protenix) used to design epitope-targeted nanobodies and scFvs. The broader tool categories below reflect the team's wider computational toolkit, used across multiple programs rather than tied to one pipeline; treat this as a capability catalog rather than a claim that every tool listed is in simultaneous production use.",
     toolCategories: [
@@ -248,9 +245,8 @@ export const PLATFORM: PlatformEntry[] = [
     kindLabel: "Computational Toolkit",
     summary:
       "Biomarker identification, MD simulations, interaction analysis, docking, and germline analysis.",
-    image:
-      "https://images.unsplash.com/photo-1606206591513-adbfbdd7a177?auto=format&fit=crop&q=80&w=1600",
-    imageAlt: "Rows of color-coded blood and biomarker sample tubes in a laboratory rack",
+    art: "biomarkerNetwork",
+    artDescription: "A correlation network of molecular features with a prioritised cluster",
     description:
       "Alongside our antibody work, we run computational genomics and biomarker pipelines: biomarker identification, molecular dynamics simulations, interaction analysis, docking, and germline analysis. This capability area is newer than our antibody pipelines and is presented here at a summary level while the team documents it in the same depth as the lead-optimization pipeline and de novo toolkit above.",
     capabilities: [
