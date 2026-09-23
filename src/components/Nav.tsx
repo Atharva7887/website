@@ -29,7 +29,7 @@ const links: NavLink[] = [
     groups: SERVICE_GROUPS.map((g) => ({
       label: g.label,
       items: servicesInGroup(g.id).map((s) => ({
-        label: s.title,
+        label: s.navLabel ?? s.title,
         href: `/services/${s.slug}`,
       })),
     })),

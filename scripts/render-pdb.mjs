@@ -1,5 +1,5 @@
 // Renders PDB coordinates into Goodsell-style space-filling SVGs for public/structures.
-// Usage: node scripts/render-pdb.mjs <dir containing 1IGT.pdb 3HFM.pdb 1HSG.pdb 1BRS.pdb 1UBQ.pdb>
+// Usage: node scripts/render-pdb.mjs <dir containing 1IGT.pdb 3HFM.pdb 1HSG.pdb 1BRS.pdb>
 // Source files: https://files.rcsb.org/download/<ID>.pdb (PDB data is CC0). Not committed.
 import fs from "node:fs";
 import path from "node:path";
@@ -219,25 +219,5 @@ const NAVY = "#1E5BA8", NAVY_L = "#7FA6DA", GOLD = "#F4C430", GOLD_D = "#C9920F"
     colorOf: (p) => (p.chain === "A" ? (iA.has(k(p)) ? GOLD_D : NAVY) : iD.has(k(p)) ? GOLD : SAND),
     groupOf: (p) => (p.chain === "D" ? "partner" : ""), moving: true,
     style: ".partner{animation:assoc 8s cubic-bezier(.16,1,.3,1) infinite}@keyframes assoc{0%{transform:translate(24px,0)}40%,85%{transform:none}100%{transform:translate(24px,0)}}",
-  });
-}
-
-/* 1UBQ — ubiquitin coloured by crystallographic B-factor (navy low → gold high). */
-{
-  const a = parse("1UBQ"); center(a); pcaAlign(a);
-  const bs = a.map((p) => p.b).sort((x, y) => x - y);
-  const lo = bs[Math.floor(bs.length * 0.05)], hi = bs[Math.floor(bs.length * 0.95)];
-  const lerp = (t) => {
-    const stops = [[30, 91, 168], [200, 214, 234], [244, 196, 48]];
-    const [c1, c2, u] = t < 0.5 ? [stops[0], stops[1], t * 2] : [stops[1], stops[2], (t - 0.5) * 2];
-    const c = c1.map((v, i) => Math.round(v + (c2[i] - v) * u));
-    return `#${c.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
-  };
-  render("1UBQ", a, {
-    file: "ubiquitin-bfactor-1ubq.svg",
-    title: "Ubiquitin coloured by crystallographic B-factor, PDB 1UBQ",
-    colorOf: (p) => lerp(Math.min(1, Math.max(0, (p.b - lo) / (hi - lo)))),
-    groupOf: (p) => ((p.b - lo) / (hi - lo) > 0.6 ? "flex" : ""),
-    style: ".flex{animation:wob 2.6s ease-in-out infinite}@keyframes wob{50%{transform:translate(.5px,-.6px)}}",
   });
 }

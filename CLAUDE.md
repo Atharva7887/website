@@ -18,9 +18,14 @@ Sanity Studio embedded at `/studio`. Content (Capabilities, Stats, Team) is fetc
 Pages follow SHOW → EXPLAIN → GUIDE: one-sentence copy, every card/step carries a visual.
 - `src/components/science/` — `Illustrations` (240×160 schematics), `Glyphs` (48×48 icons for steps/cards/deliverables), `MotionStory` (hero "video" built from schematics; pauses offscreen, reduced-motion aware), `VisualPipeline` (horizontal ≥lg, vertical timeline below), `PersistenceComparison` (MD, seeded illustrative curves).
 - Service detail pages are data-driven from `src/lib/services-data.ts`; each entry's `layout` sets section order so pages don't share one rhythm.
+- Positioning is **AI-assisted computational biology**, never "accelerated"/"faster". "GPU-accelerated" is allowed only as a technical statement about simulation infrastructure.
+- Service-page IA: "What we analyse" = concepts only (no charts). "What comes in → process → what goes out" (`inputs`, `ioProcess`, `deliverables`) holds outputs; example plots (`ioGraphs`, `OutputGraphs`) live only there and are labelled illustrative.
+- Docking scores / predicted rankings are never called affinities; label them "predicted / computational".
 - No stock photography; all visuals are original SVG. Charts/frames are schematic and labelled as such.
 - Real imagery = `src/lib/media.ts` (asset inventory: source, licence, where used). Structure renders in `public/structures/` are drawn from CC0 PDB coordinates by `scripts/render-pdb.mjs` (raw .pdb not committed); rendered via `MediaFigure` with a credit link. `public/hero-video.mp4` is the owned antibody render (Antibody Discovery hero, `LoopVideo`).
-- Services with bespoke pages (`genomics` = WES, `biomarker-identification`) set `custom: true` in services-data and live in their own route folders; `[slug]` skips them.
+- Services with bespoke pages (`genomics` = WES, `genomics/oncology-somatic-variant-analysis`, `biomarker-identification`) set `custom: true` in services-data and live in their own route folders; `[slug]` skips them. Genomics pages share `GenomicsNav`; `navLabel` sets their Nav dropdown text.
+- "What comes in → process → what goes out" is the shared `InputsOutputs` component (ServiceSections.tsx) — use it on every service page rather than a bespoke deliverables block.
+- Oncology copy: findings "support review by qualified clinical professionals"; never "diagnoses" or "determines treatment"; tumour-only calls are "likely somatic"; every capability is qualified "where supported by panel design and data quality".
 - `PendingContent` wraps copy that states an unconfirmed operational/legal/clinical commitment (turnaround, data protection, ownership, clinical use). Shown in dev, stripped from production builds. Remove the wrapper only once the business confirms the wording.
 - No submission backend exists for the Partner or WES request forms, and there are no Terms/Privacy pages yet.
 - Third-party video only via `ExternalVideoCard` (click-to-load youtube-nocookie facade, visible credit + source link), and only for videos whose owner allows embedding. None are configured yet.

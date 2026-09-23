@@ -20,8 +20,9 @@ import type { MediaId } from "@/lib/media";
  * - Structure prediction yields candidate models; docking yields candidate
  *   poses; MD describes behaviour over a simulated trajectory. None of the
  *   three is experimental proof of binding. The hedging is deliberate.
- * - Sparklines, story frames and comparison charts are schematic, never
- *   plotted from real runs, and are labelled as such in the UI.
+ * - Story frames, comparison charts and output plots are schematic, never
+ *   plotted from real runs, and are labelled as such in the UI. "What we
+ *   analyse" lists concepts only; example plots belong in "What goes out".
  * - `videos` must only hold embeddable videos on their owner's channel with
  *   credit — see ExternalVideoCard.
  */
@@ -40,6 +41,8 @@ export type ServiceCard = {
   subtitle?: string;
   body: string;
   illustration?: IllustrationName;
+  /** A real-data render instead of a schematic — see src/lib/media.ts. */
+  media?: MediaId;
   glyph?: GlyphName;
   /** Tiny visual chain under the figure, e.g. ["Reads", "Lineages", "Candidates"]. */
   path?: string[];
@@ -52,10 +55,12 @@ export type ServiceCardGroup = {
   /** "glyph" renders an icon tile instead of a full illustration. */
   variant?: "illustrated" | "glyph";
   cards: ServiceCard[];
+  /** Compact chip row under the grid for secondary capabilities. */
+  chips?: { label: string; items: string[] };
 };
 
-export type ServiceAnalysis = { name: string; meaning: string; spark?: string };
-export type ServiceHighlight = { value: string; label: string; body: string; glyph?: GlyphName };
+/** An analysis concept — deliberately no chart; plots live in "What goes out". */
+export type ServiceAnalysis = { name: string; meaning: string; glyph?: GlyphName };
 export type ServiceItem = { title: string; glyph: GlyphName };
 
 /**
@@ -68,7 +73,6 @@ export type SectionKey =
   | "real"
   | "flow"
   | `cards:${string}`
-  | "highlights"
   | "workflow"
   | "analyses"
   | "comparison"
@@ -83,6 +87,8 @@ export type SectionKey =
 export type ServiceEntry = {
   slug: string;
   title: string;
+  /** Shorter/qualified label for the Nav dropdown, e.g. "Genomics — Oncology". */
+  navLabel?: string;
   /** One line — cards, nav dropdown, hero lede. */
   summary: string;
   /** One or two sentences. Never a paragraph. */
@@ -96,7 +102,7 @@ export type ServiceEntry = {
   /** A real-data visual (PDB render / project video) for the hero. */
   heroMedia?: MediaId;
   /** Real-structure rows, rendered image-beside-text and alternating sides. */
-  realImages?: { media: MediaId; kicker: string; title: string; body: string }[];
+  realImages?: { media?: MediaId; art?: IllustrationName; artCaption?: string; kicker: string; title: string; body: string }[];
   /** Page has its own route under app/(site)/services; excluded from [slug]. */
   custom?: boolean;
   significance?: string;
@@ -106,16 +112,23 @@ export type ServiceEntry = {
   cardGroups?: ServiceCardGroup[];
   workflow?: ServiceStep[];
   workflowLabel?: string;
+  /** One-line statement set under the workflow. */
+  workflowClosing?: string;
   analyses?: ServiceAnalysis[];
   analysesLabel?: string;
   comparison?: { label: string; lede: string };
   closingFlow?: { label: string; steps: ServiceStep[]; body: string };
   applications?: string[];
   inputs?: ServiceItem[];
+  /** Reassurance under the inputs, e.g. "Not sure what files you have?…" */
+  inputsNote?: string;
+  /** The computational steps between inputs and outputs, shown in the IO section. */
+  ioProcess?: string[];
+  /** Show the illustrative output-plot panel in "What goes out". */
+  ioGraphs?: boolean;
   deliverables?: ServiceItem[];
-  highlights?: ServiceHighlight[];
-  highlightsLabel?: string;
   faqs?: { q: string; a: string }[];
+  faqTitle?: string;
   videos?: ExternalVideo[];
   note?: string;
   gettingStarted?: ServiceStep[];
@@ -311,27 +324,21 @@ export const SERVICES: ServiceEntry[] = [
     summary: "Candidate binding poses and interface maps, ranked and explained.",
     description:
       "Structure-based docking to predict candidate binding poses and characterise interfaces. It generates and ranks structural hypotheses — not evidence that binding occurs.",
-    story: {
-      label: "Protein meets partner",
-      description: "A ligand approaching a pocket, candidate poses sampled, one pose selected, and its interface mapped",
-      frames: [
-        { art: "ligandApproach", title: "Approach", caption: "Partner and target are prepared and brought together." },
-        { art: "dockingPoses", title: "Candidate poses", caption: "Orientations are sampled across the site, then ranked." },
-        { art: "proteinSmallMolecule", title: "Selected pose", caption: "A shortlisted pose, sitting in the pocket." },
-        { art: "interfaceMap", title: "Interface highlighted", caption: "The residues across the interface, mapped." },
-      ],
-    },
+    heroMedia: "proteaseLigand",
     cardGroups: [
       {
-        id: "why",
-        label: "Why docking?",
-        variant: "glyph",
+        id: "analyse",
+        label: "What we analyse",
         cards: [
-          { title: "Binding orientation", body: "How a partner could plausibly sit in the site.", glyph: "orientation" },
-          { title: "Interface exploration", body: "Pockets, patches, and epitope regions characterised.", glyph: "pocket" },
-          { title: "Interaction mapping", body: "The residues that sit across the interface.", glyph: "interaction" },
-          { title: "Candidate comparison", body: "Rank a design series before committing to testing.", glyph: "compare" },
+          { title: "Binding-Pose Prediction", body: "Explore plausible orientations of interacting molecules within a predicted complex.", illustration: "dockingPoses" },
+          { title: "Binding Interface Characterization", body: "Identify potential binding pockets, surface patches, and interface regions.", media: "barnaseBarstar" },
+          { title: "Residue-Level Interaction Mapping", body: "Map interface residues and characterise predicted molecular contacts.", media: "fabLysozyme" },
+          { title: "Comparative Candidate Analysis", body: "Compare predicted poses, interfaces, and interaction patterns across candidates.", illustration: "candidateCompare" },
         ],
+        chips: {
+          label: "Also available",
+          items: ["Hotspot analysis", "Epitope / paratope mapping", "SAR interpretation across a ligand series", "AlphaFold model assessment"],
+        },
       },
       {
         id: "types",
@@ -339,46 +346,22 @@ export const SERVICES: ServiceEntry[] = [
         lede: "Six system types, each with its own sampling and scoring considerations.",
         cards: [
           { title: "Protein–Small Molecule", body: "Pocket-directed docking with interaction breakdown.", illustration: "proteinSmallMolecule" },
-          { title: "Protein–Protein", body: "Association modes and interface characterisation.", illustration: "proteinProtein" },
+          { title: "Protein–Protein", body: "Association modes between two protein partners.", illustration: "proteinProtein" },
           { title: "Antibody–Antigen", body: "CDR-aware docking of the paratope–epitope interface.", illustration: "antibodyAntigen" },
           { title: "Protein–Peptide", body: "Flexible docking where backbone freedom matters.", illustration: "proteinPeptide" },
           { title: "Protein–DNA", body: "Duplex association with groove and electrostatic contacts.", illustration: "proteinDNA" },
           { title: "Protein–RNA", body: "Association that allows for RNA flexibility.", illustration: "proteinRNA" },
         ],
       },
-      {
-        id: "specialised",
-        label: "Specialised analysis",
-        variant: "glyph",
-        cards: [
-          { title: "Residue interaction analysis", body: "Per-residue contacts, by type.", glyph: "residues" },
-          { title: "Hotspot analysis", body: "Residues that dominate the interface.", glyph: "hotspot" },
-          { title: "Epitope / paratope mapping", body: "The surfaces each partner engages.", glyph: "epitope" },
-          { title: "Interface analysis", body: "Shape, burial, and complementarity.", glyph: "interface" },
-          { title: "SAR interpretation", body: "Where applicable, across a ligand series.", glyph: "sar" },
-          { title: "AlphaFold model assessment", body: "Where applicable, before docking into a model.", glyph: "model" },
-        ],
-      },
     ],
     workflowLabel: "Our workflow",
     workflow: [
-      { title: "Structure preparation", body: "Cleaned, protonated, assessed.", glyph: "prep" },
-      { title: "Docking", body: "Poses sampled across the site.", glyph: "dock" },
-      { title: "Ranking & clustering", body: "Poses grouped into binding modes.", glyph: "cluster" },
-      { title: "Candidate selection", body: "Score, population, plausibility.", glyph: "select" },
-      { title: "Interaction analysis", body: "Each pose broken into contacts.", glyph: "interaction" },
-      { title: "Visualisation", body: "Complexes and key contacts.", glyph: "visualise" },
-      { title: "Report", body: "Methods, results, limitations.", glyph: "report" },
+      { title: "Structure Preparation", body: "Target and partner are processed, with the binding site defined where applicable.", glyph: "prep" },
+      { title: "Candidate Pose Generation", body: "Binding orientations are sampled and evaluated with the selected docking method.", glyph: "dock" },
+      { title: "Pose Selection", body: "Representative poses are shortlisted by score, clustering, and structural assessment.", glyph: "select" },
+      { title: "Interface Characterization", body: "Interface residues and predicted interactions of the selected complex are characterised.", glyph: "interface" },
     ],
-    analysesLabel: "What we analyse",
-    analyses: [
-      { name: "Binding pose", meaning: "Candidate orientation", spark: "arc" },
-      { name: "Docking score", meaning: "Ranking distribution", spark: "steps" },
-      { name: "Hydrogen bonds", meaning: "Donor–acceptor contacts", spark: "spiky" },
-      { name: "Salt bridges", meaning: "Charged-pair contacts", spark: "steps" },
-      { name: "Hydrophobic contacts", meaning: "Non-polar packing", spark: "flat" },
-      { name: "Buried surface", meaning: "Interface area", spark: "rise" },
-    ],
+    workflowClosing: "From predicted binding poses to structural insights for drug discovery.",
     closingFlow: {
       label: "Docking and MD together",
       steps: [
@@ -391,16 +374,22 @@ export const SERVICES: ServiceEntry[] = [
     },
     applications: ["Drug discovery", "Biologics", "Antibody engineering", "Peptide therapeutics", "Protein engineering", "Molecular recognition"],
     inputs: [
-      { title: "Target structure or sequence", glyph: "structure" },
-      { title: "Partner(s): ligand, protein, peptide, nucleic acid", glyph: "complex" },
-      { title: "Known site or residues, if any", glyph: "target" },
+      { title: "Protein sequence", glyph: "sequence" },
+      { title: "Protein structure / predicted structure", glyph: "structure" },
+      { title: "Antibody heavy / light chains", glyph: "immune" },
+      { title: "Known binding-site information", glyph: "target" },
+      { title: "Peptide / ligand structure", glyph: "sar" },
+      { title: "Relevant constraints", glyph: "objective" },
+      { title: "Candidate molecules", glyph: "candidate" },
     ],
+    ioProcess: ["Structure preparation", "Docking"],
     deliverables: [
-      { title: "Ranked poses", glyph: "rank" },
+      { title: "Ranked candidate poses", glyph: "rank" },
       { title: "Complex structures", glyph: "complex" },
-      { title: "Interaction tables", glyph: "table" },
       { title: "Interface maps", glyph: "map" },
-      { title: "Visualisations", glyph: "visualise" },
+      { title: "Residue interaction tables", glyph: "table" },
+      { title: "Pose comparisons", glyph: "compare" },
+      { title: "Structural visualisations", glyph: "visualise" },
       { title: "Analysis report", glyph: "report" },
     ],
     faqs: [
@@ -408,22 +397,7 @@ export const SERVICES: ServiceEntry[] = [
       { q: "Can you dock into a predicted structure?", a: "Yes, after assessing model confidence around the site — low-confidence regions are flagged before docking." },
       { q: "When should MD follow docking?", a: "When the decision depends on whether a pose is maintained, or when several poses score similarly." },
     ],
-    heroMedia: "proteaseLigand",
-    realImages: [
-      {
-        media: "barnaseBarstar",
-        kicker: "Protein–protein",
-        title: "Two surfaces, one interface.",
-        body: "Barnase and barstar, a textbook tight complex. Gold marks the residues each partner buries against the other — what an interface map summarises for a docked pose.",
-      },
-      {
-        media: "fabLysozyme",
-        kicker: "Antibody–antigen",
-        title: "Epitope and paratope.",
-        body: "For antibodies, the question is which antigen surface the CDRs engage. Docking proposes it; the contacts are then enumerated so the result is interpretable, not just a score.",
-      },
-    ],
-    layout: ["cards:why", "story", "cards:types", "real", "workflow", "cards:specialised", "analyses", "closingFlow", "io", "applications", "faq", "note"],
+    layout: ["cards:analyse", "cards:types", "workflow", "closingFlow", "io", "applications", "faq", "note"],
     note: "A high-scoring pose is a structural hypothesis, not a demonstration that two molecules bind, and docking scores are not affinities.",
     ctaLabel: "Talk to our computational biology team",
   },
@@ -431,30 +405,24 @@ export const SERVICES: ServiceEntry[] = [
     slug: "molecular-dynamics",
     title: "Molecular Dynamics Simulation",
     group: "computational",
-    art: "trajectoryMotion",
-    artDescription: "A protein complex in motion above a sampled trajectory trace with a travelling marker",
+    art: "structuralFluctuation",
+    artDescription: "Overlaid trajectory frames of a protein backbone with a per-residue flexibility profile beneath",
     summary: "From static poses to dynamic behaviour.",
     description:
-      "GPU-accelerated simulation of stability and interaction persistence. A docked pose is a single frame; a trajectory shows whether it holds together.",
+      "Simulation of stability and interaction persistence over time. A docked pose is a single frame; a trajectory shows whether it holds together.",
     story: {
-      label: "Static pose to trajectory",
-      description: "A static complex set in motion, sampled over a trajectory, with persistent contacts separated from transient ones",
+      label: "Static complex to analysis",
+      description: "A static complex set in motion, frames fluctuating, persistent contacts separated from transient ones, and the results analysed",
       frames: [
         { art: "proteinSmallMolecule", title: "Static complex", caption: "A docked pose: one frame, no time." },
-        { art: "trajectoryMotion", title: "Trajectory", caption: "The system moves under a force field; the trace samples the run." },
-        { art: "contactPersistence", title: "Interaction persistence", caption: "Some contacts hold; others fade early." },
-        { art: "energyLandscape", title: "Energetics", caption: "Where appropriate, end-state estimates compare candidates." },
+        { art: "trajectoryMotion", title: "MD trajectory", caption: "The solvated system evolves under a force field." },
+        { art: "structuralFluctuation", title: "Structural fluctuation", caption: "Frames overlay; loops and termini move most." },
+        { art: "contactPersistence", title: "Interaction persistence", caption: "Some contacts hold across the run; others fade early." },
+        { art: "trajectoryAnalysis", title: "Analysis", caption: "Deviation, flexibility, and contacts are quantified." },
       ],
     },
     significanceLabel: "Why molecular dynamics?",
     significance: "A static structure can't tell a persistent interaction from one that merely looks right in a single frame.",
-    flowLabel: "The conceptual step",
-    flow: [
-      { title: "Static", body: "A single docked frame.", glyph: "pose" },
-      { title: "Simulation", body: "Solvated, equilibrated, run.", glyph: "production" },
-      { title: "Trajectory", body: "Nanoseconds of sampled motion.", glyph: "trajectory" },
-      { title: "Dynamic behaviour", body: "What persists, what moves.", glyph: "persist" },
-    ],
     cardGroups: [
       {
         id: "questions",
@@ -470,15 +438,18 @@ export const SERVICES: ServiceEntry[] = [
         ],
       },
       {
-        id: "services",
-        label: "MD services",
+        id: "applications",
+        label: "Applications of molecular dynamics",
         cards: [
-          { title: "Protein", body: "Stability, flexibility, and domain motion.", illustration: "trajectoryMotion" },
-          { title: "Protein–Ligand", body: "Pose retention and contact persistence.", illustration: "proteinSmallMolecule" },
-          { title: "Protein–Protein", body: "Interface stability across the run.", illustration: "proteinProtein" },
-          { title: "Antibody–Antigen", body: "CDR flexibility and paratope–epitope contacts.", illustration: "antibodyAntigen" },
-          { title: "Mutation / Variant", body: "Matched wild-type and variant runs, compared.", illustration: "mutationVariant" },
-          { title: "Free Energy", body: "End-state estimates, reported comparatively.", illustration: "energyLandscape" },
+          { title: "Docking Pose Validation", body: "Test whether a docked pose stays stable and its interactions persist over time.", illustration: "contactPersistence" },
+          { title: "Antibody–Antigen Dynamics", body: "Characterise Fv–antigen interfaces, CDR contacts, and binding behaviour through the run.", media: "fabLysozyme" },
+          { title: "Protein–Protein Interaction Analysis", body: "Follow interface stability, residue contacts, and hydrogen-bond networks across the trajectory.", illustration: "proteinProtein" },
+          { title: "Candidate Prioritization", body: "Separate candidates on stability, interaction persistence, and energetic profiles to support experimental selection.", illustration: "candidateCompare" },
+          { title: "Mutation & Variant Analysis", body: "Evaluate how sequence changes affect stability, flexibility, and binding interfaces.", illustration: "mutationVariant" },
+          { title: "Binding & Free-Energy Analysis", body: "Estimate binding contributions with MM-PBSA/MM-GBSA and residue-level decomposition.", illustration: "energyLandscape" },
+          { title: "Stability & Conformational Dynamics", body: "Capture flexibility and conformational states that a single static structure can't show.", illustration: "conformationalStates" },
+          { title: "Lead Optimization", body: "Compare binding modes and dynamic behaviour across a candidate series to guide design.", illustration: "leadOptimization" },
+          { title: "Biologics & Protein Engineering", body: "Assess engineered antibodies and proteins for interface behaviour and stability.", illustration: "biologicsEngineering" },
         ],
       },
     ],
@@ -486,71 +457,97 @@ export const SERVICES: ServiceEntry[] = [
       label: "What a trajectory can separate",
       lede: "Three candidates can look equally plausible as static poses. Simulated over time, their contact profiles often diverge.",
     },
-    highlightsLabel: "Simulation range",
-    highlights: [
-      { value: "10–500 ns", label: "Typical production range", body: "Indicative — length is set per project by system size and question.", glyph: "range" },
-      { value: "GPU", label: "Accelerated engine", body: "What makes replicates and multi-candidate comparisons practical.", glyph: "gpu" },
+    realImages: [
+      {
+        art: "structuralFluctuation",
+        artCaption: "Original schematic of a trajectory ensemble and per-residue RMSF · illustrative, not project data",
+        kicker: "Structural fluctuation",
+        title: "Not every region moves alike.",
+        body: "Overlay the frames of a trajectory and the core stays put while loops and termini spread. Per-residue RMSF turns that spread into a profile — gold marks the most mobile regions.",
+      },
     ],
     workflowLabel: "End-to-end MD package",
     workflow: [
       { title: "Preparation", body: "Protonation, solvation, force field.", glyph: "prep" },
       { title: "Equilibration", body: "Minimise, heat, equilibrate density.", glyph: "equilibrate" },
-      { title: "Production", body: "Agreed length and replicates.", glyph: "production" },
+      { title: "Production", body: "GPU-accelerated run at the agreed length.", glyph: "production" },
       { title: "Analysis", body: "Deviation, flexibility, contacts.", glyph: "signal" },
       { title: "Energetics", body: "End-state estimates where apt.", glyph: "energy" },
       { title: "Reporting", body: "Protocol, results, limitations.", glyph: "report" },
     ],
     analysesLabel: "What we analyse",
     analyses: [
-      { name: "RMSD", meaning: "Structural deviation", spark: "rise" },
-      { name: "RMSF", meaning: "Residue flexibility", spark: "spiky" },
-      { name: "Radius of gyration", meaning: "Compactness", spark: "flat" },
-      { name: "SASA", meaning: "Solvent exposure", spark: "decay" },
-      { name: "Hydrogen bonds", meaning: "H-bond occupancy", spark: "steps" },
-      { name: "Contacts", meaning: "Residue interactions", spark: "spiky" },
-      { name: "Interaction persistence", meaning: "Contact lifetime", spark: "decay" },
-      { name: "PCA", meaning: "Collective motion", spark: "arc" },
-      { name: "MM-PBSA / MM-GBSA", meaning: "Comparative energy estimate", spark: "decay" },
+      { name: "RMSD", meaning: "Structural deviation", glyph: "stable" },
+      { name: "RMSF", meaning: "Residue flexibility", glyph: "residues" },
+      { name: "Radius of gyration", meaning: "Compactness", glyph: "target" },
+      { name: "SASA", meaning: "Solvent exposure", glyph: "hotspot" },
+      { name: "Hydrogen bonds", meaning: "H-bond occupancy", glyph: "interaction" },
+      { name: "Contacts", meaning: "Residue interactions", glyph: "map" },
+      { name: "Interaction persistence", meaning: "Contact lifetime", glyph: "persist" },
+      { name: "PCA", meaning: "Collective motion", glyph: "cluster" },
+      { name: "MM-PBSA / MM-GBSA", meaning: "Comparative energy estimate", glyph: "energy" },
     ],
-    applications: ["Drug discovery", "Biologics", "Antibody engineering", "Protein engineering", "Structure-based design"],
     inputs: [
-      { title: "Starting structure or docked complex", glyph: "complex" },
-      { title: "Ligand parameters, if non-standard", glyph: "sar" },
-      { title: "Candidates to compare", glyph: "compare" },
+      { title: "Protein structure", glyph: "structure" },
+      { title: "Protein sequence (modelled first)", glyph: "sequence" },
+      { title: "Ligand / binding partner", glyph: "sar" },
+      { title: "Mutation / variant information", glyph: "variant" },
+      { title: "Simulation parameters", glyph: "range" },
+      { title: "Complex / docking pose", glyph: "complex" },
     ],
+    ioProcess: ["System preparation", "MD simulation", "Trajectory analysis"],
+    ioGraphs: true,
     deliverables: [
-      { title: "Trajectory", glyph: "trajectory" },
-      { title: "Analysis & plots", glyph: "signal" },
-      { title: "Visualisations", glyph: "visualise" },
-      { title: "Energetics, where in scope", glyph: "energy" },
+      { title: "Trajectory files", glyph: "trajectory" },
+      { title: "Comparative tables", glyph: "table" },
+      { title: "Structural visualisations", glyph: "visualise" },
       { title: "Final report", glyph: "report" },
     ],
+    faqTitle: "Frequently Asked Questions — Molecular Dynamics Simulation",
     faqs: [
-      { q: "How long should a simulation be?", a: "It depends on the system and question. We set length and replicate count per project and state the rationale." },
-      { q: "Does a stable trajectory prove binding?", a: "No. It is supporting computational evidence under a chosen force field, not experimental confirmation." },
-      { q: "Are MM-PBSA / MM-GBSA values absolute affinities?", a: "No. We report them comparatively, across candidates simulated under matched conditions." },
-    ],
-    realImages: [
       {
-        media: "ubiquitinB",
-        kicker: "Flexibility, on a real structure",
-        title: "Not every region moves alike.",
-        body: "Ubiquitin coloured by crystallographic B-factor: the rigid core is navy, the mobile C-terminal tail gold. A crystal gives this static hint; per-residue RMSF from a trajectory measures it under simulation.",
+        q: "What is Molecular Dynamics (MD) simulation?",
+        a: "Molecular Dynamics is a computational approach that simulates the movement and interactions of atoms over time, providing insights into molecular stability, flexibility, binding behavior, and conformational changes.",
+      },
+      {
+        q: "How does MD complement molecular docking?",
+        a: "Docking provides a static prediction of a possible binding pose, while MD evaluates how that pose behaves dynamically. It can assess structural stability, interaction persistence, interface changes, and energetic properties throughout the simulation.",
+      },
+      {
+        q: "What simulation timescales do you offer?",
+        a: "We offer GPU-accelerated simulations ranging from 10 ns to 500 ns, with simulation length selected according to the molecular system, project objectives, and required level of dynamic analysis.",
+      },
+      {
+        q: "What insights can be obtained from an MD simulation?",
+        a: "MD simulations can provide insights into structural stability, residue flexibility, interaction persistence, hydrogen bonds, salt bridges, interface behavior, conformational changes, and binding energetics, supported by analyses such as RMSD, RMSF, SASA, contact analysis, and MM-PBSA/MM-GBSA.",
       },
     ],
-    layout: ["intro", "flow", "cards:questions", "comparison", "real", "cards:services", "workflow", "analyses", "highlights", "io", "faq", "note"],
+    layout: ["intro", "cards:questions", "comparison", "real", "analyses", "workflow", "io", "cards:applications", "faq", "note"],
     note: "MD describes behaviour under a chosen force field over a finite trajectory. A stable run is supporting computational evidence, not confirmation of a biological interaction, and free-energy estimates are comparative rather than absolute.",
     ctaLabel: "Talk to our computational biology team",
   },
   {
     slug: "genomics",
     title: "Genomics",
+    navLabel: "Genomics — Whole Exome Sequencing",
     group: "computational",
     custom: true,
     art: "exomeCapture",
     artDescription: "Exons captured from a genome, sequenced as reads, with a variant marked",
     summary: "Whole exome sequencing analysis — raw FASTQ to an annotated, classified variant report.",
     description: "Bioinformatics analysis of exome sequencing data, from raw reads to a classified variant report.",
+    ctaLabel: "Request analysis",
+  },
+  {
+    slug: "genomics/oncology-somatic-variant-analysis",
+    title: "Oncology: Somatic Variant Analysis",
+    navLabel: "Genomics — Oncology: Somatic Variants",
+    group: "computational",
+    custom: true,
+    art: "tumourPanel",
+    artDescription: "A tumour sample, targeted panel regions, and sequencing reads with somatic variant positions marked",
+    summary: "Tumour panel sequencing analysis — raw FASTQ to an annotated, tiered variant report.",
+    description: "Bioinformatics analysis of targeted oncology panel data, returning prioritised somatic variants with allele fractions and supporting evidence.",
     ctaLabel: "Request analysis",
   },
   {

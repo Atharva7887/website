@@ -55,7 +55,13 @@ function Choice({ name, options, legend, required }: { name: string; options: st
   );
 }
 
-export default function WesRequestForm({ defaultAnalysis }: { defaultAnalysis: string }) {
+export default function WesRequestForm({
+  defaultAnalysis,
+  consentLabel = "I accept the Terms and Conditions and Privacy Policy",
+}: {
+  defaultAnalysis: string;
+  consentLabel?: string;
+}) {
   const [analysis, setAnalysis] = useState(defaultAnalysis);
   const [stage, setStage] = useState<"idle" | "submitting" | "success">("idle");
   const id = useId();
@@ -88,6 +94,14 @@ export default function WesRequestForm({ defaultAnalysis }: { defaultAnalysis: s
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-black/10 bg-cream-50 p-6 md:p-9 space-y-6" aria-describedby={f("privacy")}>
+      <p id={f("privacy")} role="note" className="flex items-start gap-3 rounded-xl border border-gold/50 bg-gold/15 px-4 py-3 text-[0.9rem] font-medium leading-[1.45] text-ink">
+        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true">
+          <path d="M10 2 L18 17 L2 17 Z" fill="#F4C430" stroke="#1A1A1A" strokeWidth="1.2" strokeLinejoin="round" />
+          <path d="M10 8 L10 12" stroke="#1A1A1A" strokeWidth="1.6" strokeLinecap="round" />
+          <circle cx="10" cy="14.5" r="1" fill="#1A1A1A" />
+        </svg>
+        Please do not include patient identifiers or clinical records in this form.
+      </p>
       <div>
         <Label htmlFor={f("analysis")} required>Analysis required</Label>
         <input id={f("analysis")} name="analysis" required value={analysis} onChange={(e) => setAnalysis(e.target.value)} className={input} />
@@ -108,16 +122,12 @@ export default function WesRequestForm({ defaultAnalysis }: { defaultAnalysis: s
 
       <div>
         <Label htmlFor={f("message")}>How can we help you?</Label>
-        <textarea id={f("message")} name="message" rows={4} className={`${input} resize-y`} />
-        <p id={f("privacy")} className="mt-2 flex items-start gap-2 text-[0.8rem] leading-[1.5] text-ink-soft">
-          <span aria-hidden className="mt-[3px] inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
-          Please do not include patient identifiers or clinical records in this form.
-        </p>
+        <textarea id={f("message")} name="message" rows={4} placeholder="Panel or assay, sample types, and what you need from the analysis — no patient details." className={`${input} resize-y`} />
       </div>
 
       <label className="flex items-start gap-3 text-[0.88rem] leading-[1.5] text-ink">
         <input type="checkbox" name="consent" required className="mt-1 h-4 w-4 shrink-0 accent-[#1E5BA8]" />
-        <span>I accept the Terms and Conditions and Privacy Policy<span className="text-navy" aria-hidden> *</span></span>
+        <span>{consentLabel}<span className="text-navy" aria-hidden> *</span></span>
       </label>
 
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-black/[0.06] pt-5">

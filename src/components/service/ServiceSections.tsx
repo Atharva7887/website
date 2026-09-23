@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ScienceFigure from "@/components/science/ScienceFigure";
 import type { IllustrationName } from "@/components/science/Illustrations";
+import Glyph, { GlyphTile, type GlyphName } from "@/components/science/Glyphs";
 import { SERVICE_GROUPS, servicesInGroup, type ServiceEntry } from "@/lib/services-data";
 
 export const WRAP = "mx-auto max-w-[1400px] px-6 md:px-10";
@@ -41,6 +42,86 @@ export function FaqList({ faqs }: { faqs: { q: string; a: React.ReactNode }[] })
         </details>
       ))}
     </div>
+  );
+}
+
+export type IoItem = { title: string; glyph: GlyphName; detail?: string };
+
+/**
+ * What comes in → the computation → what goes out. Outputs sit in a results
+ * window so they read as artefacts; `outputsExtra` (example plots or a report
+ * mock) is shown inside that window, above the deliverable tiles.
+ */
+export function InputsOutputs({
+  inputs,
+  process,
+  outputs,
+  outputsExtra,
+  inputsNote,
+  title = "What comes in, what goes out",
+}: {
+  inputs?: IoItem[];
+  process?: string[];
+  outputs: IoItem[];
+  outputsExtra?: React.ReactNode;
+  inputsNote?: string;
+  title?: string;
+}) {
+  return (
+    <>
+      <SectionHead title={inputs ? title : "What you receive"} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        {inputs && (
+          <>
+            <div className="lg:col-span-3 flex flex-col rounded-2xl border border-black/5 bg-cream-50 p-6">
+              <h3 className="kicker mb-5 text-ink">What comes in</h3>
+              <ul className="space-y-3.5">
+                {inputs.map((i) => (
+                  <li key={i.title} className="flex items-center gap-3.5 text-[0.9rem] leading-snug text-ink">
+                    <GlyphTile name={i.glyph} size="sm" />
+                    {i.title}
+                  </li>
+                ))}
+              </ul>
+              {inputsNote && (
+                <p className="mt-6 flex items-start gap-2 rounded-xl bg-gold/10 p-3 text-[0.8rem] leading-[1.45] text-ink-soft">
+                  <span aria-hidden className="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
+                  {inputsNote}
+                </p>
+              )}
+            </div>
+            <div className="lg:col-span-2 flex flex-col items-stretch justify-center gap-2" aria-label="Computational analysis">
+              <span aria-hidden className="text-center text-gold-600 text-xl lg:hidden">↓</span>
+              {(process ?? ["IndiskaAI analysis"]).map((p, i, arr) => (
+                <div key={p} className="flex flex-col items-center gap-2">
+                  <span className="w-full rounded-xl bg-navy px-3 py-3 text-center text-[0.82rem] font-medium leading-snug text-cream-100">{p}</span>
+                  {i < arr.length - 1 && <span aria-hidden className="text-gold-600">↓</span>}
+                </div>
+              ))}
+              <span aria-hidden className="text-center text-gold-600 text-xl lg:hidden">↓</span>
+            </div>
+          </>
+        )}
+        <div className={`${inputs ? "lg:col-span-7" : "lg:col-span-12"} overflow-hidden rounded-2xl border border-black/10 bg-cream-50 shadow-[0_24px_60px_-40px_rgba(16,53,101,0.45)]`}>
+          <div className="flex items-center gap-2 border-b border-black/5 bg-cream-100 px-4 py-2.5">
+            <span className="h-2 w-2 rounded-full bg-black/15" />
+            <span className="h-2 w-2 rounded-full bg-black/15" />
+            <span className="h-2 w-2 rounded-full bg-gold" />
+            <h3 className="ml-2 text-[0.7rem] tracking-[0.12em] uppercase text-ink-muted">What goes out</h3>
+          </div>
+          {outputsExtra && <div className="border-b border-black/5">{outputsExtra}</div>}
+          <ul className="grid grid-cols-2 sm:grid-cols-3 -mb-px -mr-px">
+            {outputs.map((d) => (
+              <li key={d.title} className="flex flex-col gap-3 border-b border-r border-black/5 bg-cream-50 p-5">
+                <Glyph name={d.glyph} className="h-10 w-10" />
+                <span className="text-[0.88rem] leading-[1.35] text-ink">{d.title}</span>
+                {d.detail && <span className="-mt-1.5 text-[0.78rem] leading-[1.4] text-ink-muted">{d.detail}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </>
   );
 }
 

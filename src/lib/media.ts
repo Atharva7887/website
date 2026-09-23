@@ -74,7 +74,11 @@ export const MEDIA = {
     creditUrl: pdb("3HFM"),
     source: "RCSB PDB 3HFM (HyHEL-10 Fab–lysozyme)",
     license: "PDB data CC0; render original",
-    usedOn: ["/services/structural-analysis", "/services/molecular-docking"],
+    usedOn: [
+      "/services/structural-analysis",
+      "/services/molecular-docking (Residue-Level Interaction Mapping card)",
+      "/services/molecular-dynamics (Antibody–Antigen Dynamics card)",
+    ],
   },
   proteaseLigand: {
     src: "/structures/protease-ligand-1hsg.svg",
@@ -98,19 +102,7 @@ export const MEDIA = {
     creditUrl: pdb("1BRS"),
     source: "RCSB PDB 1BRS (barnase–barstar)",
     license: "PDB data CC0; render original",
-    usedOn: ["/services/molecular-docking"],
-  },
-  ubiquitinB: {
-    src: "/structures/ubiquitin-bfactor-1ubq.svg",
-    kind: "structure",
-    alt: "Ubiquitin coloured from navy (rigid) to gold (mobile) by crystallographic B-factor; the flexible C-terminal tail is gold",
-    width: 640,
-    height: 451,
-    credit: "Rendered by IndiskaAI from PDB 1UBQ · coloured by crystallographic B-factor",
-    creditUrl: pdb("1UBQ"),
-    source: "RCSB PDB 1UBQ (ubiquitin)",
-    license: "PDB data CC0; render original",
-    usedOn: ["/services/molecular-dynamics"],
+    usedOn: ["/services/molecular-docking (Binding Interface Characterization card)"],
   },
 } as const satisfies Record<string, MediaAsset>;
 

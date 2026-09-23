@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 /** Where each service sits along a discovery programme. */
 const STAGES: { title: string; glyph: GlyphName; slugs: string[] }[] = [
-  { title: "Target & data", glyph: "target", slugs: ["genomics", "biomarker-identification"] },
+  { title: "Target & data", glyph: "target", slugs: ["genomics", "genomics/oncology-somatic-variant-analysis", "biomarker-identification"] },
   { title: "Discovery", glyph: "library", slugs: ["ai-assisted-antibody-libraries", "antibody-discovery", "ai-antibody-data-packages"] },
   { title: "Structure & interaction", glyph: "dock", slugs: ["structural-analysis", "molecular-docking"] },
   { title: "Dynamics & evaluation", glyph: "trajectory", slugs: ["molecular-dynamics"] },

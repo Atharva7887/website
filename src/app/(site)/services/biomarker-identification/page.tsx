@@ -7,12 +7,14 @@ import MotionStory from "@/components/science/MotionStory";
 import ScienceFigure from "@/components/science/ScienceFigure";
 import VisualPipeline, { type PipelineStep } from "@/components/science/VisualPipeline";
 import { GlyphTile, type GlyphName } from "@/components/science/Glyphs";
+import type { IllustrationName } from "@/components/science/Illustrations";
 import { Section, SectionHead, ServiceCTA } from "@/components/service/ServiceSections";
 import { getService } from "@/lib/services-data";
 
 export const metadata: Metadata = {
-  title: "Biomarker Identification",
-  description: "Sequencing data in. Defensible biomarker signatures out. Ranked, cross-validated biomarker panels from sequencing and multi-omics data.",
+  title: "AI-Assisted Biomarker Identification",
+  description:
+    "Sequencing data in. Defensible biomarker signatures out. Cross-validated biomarker panels from sequencing and multi-omics data, plus AI-assisted target-to-candidate analysis.",
 };
 
 const SOURCES = [
@@ -126,6 +128,91 @@ function SignalDiagram() {
   );
 }
 
+type Stage = {
+  title: string;
+  method: string;
+  body: string;
+  art: IllustrationName;
+  chain?: string[];
+  link?: { href: string; label: string };
+  caption?: string;
+};
+
+/** Target → candidate workflow. Each stage states its method; none claims efficacy. */
+const STAGES: Stage[] = [
+  {
+    title: "Drug Target Identification",
+    method: "AI-assisted",
+    body: "Identify and prioritise candidate targets from available biological evidence and project-specific data.",
+    art: "targetIdentification",
+    chain: ["Biological data", "Disease / pathway signals", "Candidate targets"],
+  },
+  {
+    title: "Structure-Based Virtual Screening",
+    method: "AI / computational screening",
+    body: "A compound library is screened computationally against the target's binding site.",
+    art: "virtualScreening",
+    chain: ["Target structure", "Compound library", "Ranked candidates"],
+  },
+  {
+    title: "Candidate Prioritisation",
+    method: "Predicted scoring",
+    body: "Top-ranked compounds are prioritised by the selected scoring function and predicted binding metrics.",
+    art: "candidateRanking",
+    caption: "Predicted / computational ranking — not experimental affinity.",
+  },
+  {
+    title: "Structural Docking",
+    method: "Structure-based",
+    body: "Shortlisted candidates are docked to generate and rank predicted binding poses.",
+    art: "dockingPoses",
+    chain: ["Target + candidate", "Predicted poses", "Pose ranking"],
+    link: { href: "/services/molecular-docking", label: "Molecular Docking" },
+  },
+  {
+    title: "Molecular Dynamics",
+    method: "Physics-based simulation",
+    body: "Selected poses are simulated to assess stability, interaction persistence, and conformational behaviour.",
+    art: "trajectoryMotion",
+    chain: ["Selected poses", "MD trajectory", "Dynamic behaviour"],
+    link: { href: "/services/molecular-dynamics", label: "Molecular Dynamics" },
+  },
+  {
+    title: "Comparative Analysis",
+    method: "Comparative",
+    body: "Candidates are compared on structural, dynamic, and energetic evidence to support downstream selection.",
+    art: "candidateCompare",
+  },
+];
+
+const TERMS: { term: string; def: string }[] = [
+  { term: "Biomarker identification", def: "Finding measurable biological signatures and candidate markers." },
+  { term: "Drug target identification", def: "Identifying and prioritising biological targets relevant to a disease or therapeutic hypothesis." },
+  { term: "Virtual screening", def: "Searching a compound set computationally against a target." },
+  { term: "Docking", def: "Predicting candidate binding poses and interactions." },
+  { term: "Molecular dynamics", def: "Evaluating the dynamic behaviour of selected modelled systems." },
+  { term: "Comparative analysis", def: "Comparing candidates on computational structural and dynamic evidence." },
+];
+
+/** Illustrative decision matrix: 3 = strong, 2 = mixed, 1 = weak. */
+const CRITERIA = ["Stability", "Interaction persistence", "Structural behaviour", "Energetic metrics", "Interface analysis"];
+const CANDIDATES: { name: string; scores: number[]; rank: number }[] = [
+  { name: "Candidate A", scores: [3, 3, 3, 2, 3], rank: 1 },
+  { name: "Candidate B", scores: [2, 2, 3, 3, 2], rank: 2 },
+  { name: "Candidate C", scores: [1, 1, 2, 2, 1], rank: 3 },
+];
+const LEVEL = ["", "Weak", "Mixed", "Strong"];
+
+function Dots({ n }: { n: number }) {
+  return (
+    <span className="inline-flex gap-1" aria-hidden>
+      {[1, 2, 3].map((i) => (
+        <span key={i} className={`h-2.5 w-2.5 rounded-full ${i <= n ? (n === 3 ? "bg-gold" : "bg-cream-100") : "bg-cream-100/15"}`} />
+      ))}
+    </span>
+  );
+}
+
 function Check() {
   return (
     <svg viewBox="0 0 16 16" className="mt-[3px] h-4 w-4 shrink-0" aria-hidden="true">
@@ -144,7 +231,7 @@ export default function BiomarkerPage() {
       <PageHeader
         crumbs={[{ label: "Services", href: "/services" }, { label: "Biomarker Identification" }]}
         eyebrow="Computational science"
-        title="Biomarker Identification"
+        title="AI-Assisted Biomarker Identification"
         lede="Sequencing data in. Defensible biomarker signatures out."
         cta={
           <>
@@ -359,6 +446,152 @@ export default function BiomarkerPage() {
             </p>
           </div>
         </div>
+      </Section>
+
+      {/* AI-assisted drug-discovery analysis — a separate track that biomarker evidence can feed. */}
+      <Section id="drug-discovery">
+        <div className="mb-10 md:mb-14 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+          <div className="lg:col-span-7">
+            <div className="kicker mb-3">AI-assisted drug-discovery analysis</div>
+            <h2 className="font-display text-[clamp(1.7rem,4vw,2.8rem)] leading-[1.02] tracking-tightest text-ink max-w-[20ch]">
+              From biological evidence to prioritised candidates
+            </h2>
+          </div>
+          <p className="lg:col-span-5 text-ink-soft text-[0.95rem] leading-[1.55]">
+            Biomarkers describe a disease state. When a programme moves toward therapeutics, the same evidence can inform
+            target hypotheses — and a structure-guided workflow then prioritises candidate molecules.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="rounded-full bg-ink px-4 py-2 text-[0.82rem] font-medium text-cream-100">Biological data</span>
+          <span aria-hidden className="h-px flex-1 bg-navy/20" />
+        </div>
+
+        <ol className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+          {STAGES.map((s, i) => (
+            <li key={s.title} className="flex flex-col rounded-2xl border border-black/[0.07] bg-cream-50 p-5 md:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-navy px-2 text-[0.74rem] font-medium tabular-nums text-cream-100">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="rounded-full border border-navy/15 bg-navy/[0.05] px-2.5 py-1 text-[0.7rem] tracking-[0.04em] text-navy">{s.method}</span>
+              </div>
+              <ScienceFigure name={s.art} description="" className="mt-4 h-36 bg-cream-100" />
+              <h3 className="mt-4 font-display text-[1.22rem] leading-tight tracking-tightest text-ink">{s.title}</h3>
+              <p className="mt-1.5 text-ink-soft text-[0.9rem] leading-[1.5]">{s.body}</p>
+              {s.chain && (
+                <div aria-hidden className="mt-3 flex flex-wrap items-center gap-1 text-[0.72rem] tracking-[0.04em] uppercase text-navy">
+                  {s.chain.map((c, j) => (
+                    <span key={c} className="flex items-center gap-1">
+                      <span className="rounded-full bg-navy/[0.07] px-2 py-0.5">{c}</span>
+                      {j < s.chain!.length - 1 && <span className="text-gold-600">→</span>}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {s.caption && <p className="mt-3 text-[0.76rem] text-ink-muted">{s.caption}</p>}
+              {s.link && (
+                <Link href={s.link.href} className="mt-auto pt-4 inline-flex items-center gap-1.5 text-[0.85rem] font-medium text-navy hover:text-ink">
+                  See {s.link.label}
+                  <span aria-hidden>→</span>
+                </Link>
+              )}
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-5 flex items-center gap-3">
+          <span aria-hidden className="h-px flex-1 bg-navy/20" />
+          <span className="rounded-full bg-gold px-4 py-2 text-[0.82rem] font-medium text-ink">Candidate prioritisation</span>
+        </div>
+
+        <details className="group mt-10 rounded-2xl border border-black/10 bg-cream-50/60">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-ink [&::-webkit-details-marker]:hidden">
+            <span className="font-display text-[1.1rem] tracking-tightest">How these terms differ</span>
+            <span aria-hidden className="text-navy text-xl leading-none transition-transform duration-300 group-open:rotate-45">+</span>
+          </summary>
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 px-5 pb-5">
+            {TERMS.map((t) => (
+              <div key={t.term} className="border-t border-black/[0.06] pt-3">
+                <dt className="text-[0.9rem] font-medium text-ink">{t.term}</dt>
+                <dd className="mt-0.5 text-[0.86rem] text-ink-soft">{t.def}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      </Section>
+
+      {/* Decision: what the workflow hands over — a ranked shortlist with its evidence. */}
+      <Section band="navy">
+        <div className="mb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+          <div className="lg:col-span-7">
+            <div className="text-[0.72rem] tracking-[0.18em] uppercase text-gold mb-3">Illustrative example</div>
+            <h2 className="font-display text-[clamp(1.7rem,4vw,2.8rem)] leading-[1.02] tracking-tightest">Candidate prioritisation</h2>
+          </div>
+          <p className="lg:col-span-5 text-cream-100/75 text-[0.95rem] leading-[1.55]">
+            The output is a comparative ranking and the evidence behind it — a basis for choosing what to test experimentally.
+          </p>
+        </div>
+
+        <div className="hidden md:block overflow-hidden rounded-2xl border border-cream-100/10">
+          <table className="w-full text-left">
+            <caption className="sr-only">Illustrative comparison of three candidates across five computational criteria, with a comparative rank</caption>
+            <thead className="bg-cream-100/[0.06]">
+              <tr>
+                <th scope="col" className="px-5 py-3.5 text-[0.7rem] tracking-[0.12em] uppercase text-cream-100/60 font-medium">Candidate</th>
+                {CRITERIA.map((c) => (
+                  <th key={c} scope="col" className="px-4 py-3.5 text-[0.7rem] tracking-[0.1em] uppercase text-cream-100/60 font-medium">{c}</th>
+                ))}
+                <th scope="col" className="px-5 py-3.5 text-[0.7rem] tracking-[0.12em] uppercase text-gold font-medium">Comparative rank</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CANDIDATES.map((c) => (
+                <tr key={c.name} className="border-t border-cream-100/10">
+                  <th scope="row" className="px-5 py-4 font-display text-[1.05rem] font-normal tracking-tightest">{c.name}</th>
+                  {c.scores.map((s, i) => (
+                    <td key={CRITERIA[i]} className="px-4 py-4">
+                      <Dots n={s} />
+                      <span className="sr-only">{LEVEL[s]}</span>
+                    </td>
+                  ))}
+                  <td className="px-5 py-4">
+                    <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-[0.85rem] font-medium ${c.rank === 1 ? "bg-gold text-ink" : "bg-cream-100/10 text-cream-100"}`}>
+                      {c.rank}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <ul className="md:hidden space-y-3">
+          {CANDIDATES.map((c) => (
+            <li key={c.name} className="rounded-2xl border border-cream-100/10 p-4">
+              <div className="flex items-center justify-between">
+                <span className="font-display text-[1.1rem] tracking-tightest">{c.name}</span>
+                <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-[0.85rem] font-medium ${c.rank === 1 ? "bg-gold text-ink" : "bg-cream-100/10"}`}>
+                  <span className="sr-only">Rank </span>{c.rank}
+                </span>
+              </div>
+              <dl className="mt-3 space-y-2">
+                {CRITERIA.map((cr, i) => (
+                  <div key={cr} className="flex items-center justify-between gap-3 text-[0.85rem]">
+                    <dt className="text-cream-100/75">{cr}</dt>
+                    <dd className="flex items-center gap-2"><Dots n={c.scores[i]} /><span className="sr-only">{LEVEL[c.scores[i]]}</span></dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-[0.78rem] leading-[1.5] text-cream-100/60 max-w-[74ch]">
+          Illustrative — not results from any project. Rankings rest on computational evidence (predicted scores, simulated
+          behaviour); they are not measured affinities and do not predict efficacy.
+        </p>
       </Section>
 
       <ServiceCTA

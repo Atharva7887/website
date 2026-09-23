@@ -284,6 +284,26 @@ section {
   to { transform: translate(-22px, 12px); }
 }
 
+/* Trajectory frames drifting around the mean structure. */
+.sci-wobble {
+  animation: sciWobble 3.2s ease-in-out infinite;
+}
+@keyframes sciWobble {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2px, -5px); }
+}
+
+/* A screened compound entering the pocket, then resetting. */
+.sci-enter {
+  animation: sciEnter 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+@keyframes sciEnter {
+  0% { transform: translate(-120px, 0); opacity: 0; }
+  15% { opacity: 1; }
+  55%, 90% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+
 /* ─── Reduced motion ───
    Scroll-reveals land in their final state, and the decorative loops
    (divider shimmer, float) stop. Framer Motion components opt out
@@ -304,7 +324,9 @@ section {
   .sci-pulse,
   .sci-trace,
   .sci-travel,
-  .sci-approach {
+  .sci-approach,
+  .sci-wobble,
+  .sci-enter {
     animation: none;
   }
   /* Park the trajectory marker on the curve so the figure still reads as a

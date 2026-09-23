@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Section, SectionHead, FaqList, ServiceCTA } from "@/components/service/ServiceSections";
+import { Section, SectionHead, FaqList, ServiceCTA, InputsOutputs } from "@/components/service/ServiceSections";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/PageHeader";
 import Reveal from "@/components/Reveal";
 import ExternalVideoCard from "@/components/ExternalVideoCard";
-import ScienceFigure, { MetricCard } from "@/components/science/ScienceFigure";
+import ScienceFigure from "@/components/science/ScienceFigure";
+import OutputGraphs from "@/components/science/OutputGraphs";
+import { MEDIA, type MediaId } from "@/lib/media";
 import MotionStory from "@/components/science/MotionStory";
 import VisualPipeline from "@/components/science/VisualPipeline";
 import PersistenceComparison from "@/components/science/PersistenceComparison";
-import Glyph, { GlyphTile } from "@/components/science/Glyphs";
+import { GlyphTile } from "@/components/science/Glyphs";
 import MediaFigure from "@/components/science/MediaFigure";
 import {
   SERVICES,
@@ -37,7 +39,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 }
 
 const DEFAULT_LAYOUT: SectionKey[] = [
-  "intro", "flow", "highlights", "workflow", "analyses", "comparison", "closingFlow",
+  "intro", "flow", "workflow", "analyses", "comparison", "closingFlow",
   "io", "applications", "gettingStarted", "videos", "faq", "note",
 ];
 
@@ -62,7 +64,8 @@ function CardGroup({ group }: { group: ServiceCardGroup }) {
                 <GlyphTile name={card.glyph} tone="navy" />
               </div>
             )}
-            {!glyph && card.illustration && (
+            {!glyph && card.media && <CardMedia id={card.media} />}
+            {!glyph && !card.media && card.illustration && (
               <ScienceFigure name={card.illustration} description="" className="mb-5 h-40 md:h-44 bg-cream-100" />
             )}
             {card.path && (
@@ -85,7 +88,39 @@ function CardGroup({ group }: { group: ServiceCardGroup }) {
           </article>
         ))}
       </div>
+      {group.chips && (
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <span className="kicker mr-2">{group.chips.label}</span>
+          {group.chips.items.map((c) => (
+            <span key={c} className="rounded-full border border-navy/15 bg-navy/[0.04] px-3.5 py-1.5 text-[0.82rem] text-ink">
+              {c}
+            </span>
+          ))}
+        </div>
+      )}
     </Section>
+  );
+}
+
+/** A real structure render at card size, with its PDB credit. */
+function CardMedia({ id }: { id: MediaId }) {
+  const m = MEDIA[id];
+  const pdbId = "creditUrl" in m ? m.creditUrl.split("/").pop() : undefined;
+  return (
+    <figure className="mb-5">
+      <div className="flex h-40 md:h-44 items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-gradient-to-br from-cream-50 to-cream-200/70 p-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={m.src} alt={m.alt} width={m.width} height={m.height} loading="lazy" decoding="async" className="h-full w-auto max-w-full object-contain" />
+      </div>
+      {pdbId && "creditUrl" in m && (
+        <figcaption className="mt-1.5 text-[0.7rem] text-ink-muted">
+          Real structure ·{" "}
+          <a href={m.creditUrl} target="_blank" rel="noopener noreferrer" className="underline decoration-black/20 underline-offset-2 hover:text-navy">
+            PDB {pdbId}
+          </a>
+        </figcaption>
+      )}
+    </figure>
   );
 }
 
@@ -139,7 +174,14 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
                   </h2>
                   <p className="mt-4 text-ink-soft text-[1rem] leading-[1.6] max-w-[44ch]">{r.body}</p>
                 </div>
-                <MediaFigure id={r.media} className={`lg:col-span-7 ${i % 2 ? "lg:order-1" : ""}`} frameClassName="max-h-[460px]" />
+                {r.media ? (
+                  <MediaFigure id={r.media} className={`lg:col-span-7 ${i % 2 ? "lg:order-1" : ""}`} frameClassName="max-h-[460px]" />
+                ) : r.art ? (
+                  <figure className={`lg:col-span-7 ${i % 2 ? "lg:order-1" : ""}`}>
+                    <ScienceFigure name={r.art} description={`${r.title} ${r.body}`} className="p-6 md:p-10 bg-gradient-to-br from-cream-50 to-cream-200/70" />
+                    {r.artCaption && <figcaption className="mt-2.5 text-[0.72rem] leading-[1.45] text-ink-muted">{r.artCaption}</figcaption>}
+                  </figure>
+                ) : null}
               </div>
             ))}
           </div>
@@ -178,26 +220,11 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
         <Section key={key} band="tint">
           <SectionHead title={service.workflowLabel ?? "Our workflow"} kicker={`${service.workflow.length} stages`} />
           <VisualPipeline steps={service.workflow} />
-        </Section>
-      );
-
-    case "highlights":
-      if (!service.highlights?.length) return null;
-      return (
-        <Section key={key}>
-          <div className="kicker mb-6">{service.highlightsLabel ?? "At a glance"}</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {service.highlights.map((h) => (
-              <div key={h.label} className="reveal flex items-start gap-5 rounded-2xl border border-black/5 bg-cream-50 p-6 md:p-8">
-                {h.glyph && <GlyphTile name={h.glyph} size="lg" tone="navy" />}
-                <div>
-                  <div className="font-display text-[clamp(1.8rem,4vw,2.6rem)] leading-none tracking-tightest text-navy">{h.value}</div>
-                  <div className="mt-2 text-[0.68rem] tracking-[0.14em] uppercase text-ink-muted">{h.label}</div>
-                  <p className="mt-2 text-ink-soft text-[0.88rem] leading-[1.5] max-w-[40ch]">{h.body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {service.workflowClosing && (
+            <p className="mt-4 lg:mt-12 border-t border-black/10 pt-8 font-display text-[clamp(1.25rem,2.6vw,1.8rem)] leading-[1.25] tracking-tight text-ink max-w-[40ch]">
+              {service.workflowClosing}
+            </p>
+          )}
         </Section>
       );
 
@@ -205,15 +232,18 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
       if (!service.analyses?.length) return null;
       return (
         <Section key={key}>
-          <SectionHead
-            title={service.analysesLabel ?? "What we analyse"}
-            lede="Profiles are schematic illustrations of each metric, not data from a project run."
-          />
-          <div className="grid grid-cols-2 lg:grid-cols-3 border-t border-l border-black/5 rounded-2xl overflow-hidden">
+          <SectionHead title={service.analysesLabel ?? "What we analyse"} lede="The quantities each simulation is analysed for. Example plots are under What goes out." />
+          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {service.analyses.map((a) => (
-              <MetricCard key={a.name} name={a.name} meaning={a.meaning} spark={a.spark} />
+              <li key={a.name} className="flex items-center gap-4 rounded-2xl border border-black/[0.06] bg-cream-50/70 p-4 md:p-5">
+                {a.glyph && <GlyphTile name={a.glyph} size="sm" tone="navy" />}
+                <div className="min-w-0">
+                  <div className="font-display text-[1.08rem] leading-tight tracking-tightest text-ink">{a.name}</div>
+                  <div className="mt-0.5 text-[0.84rem] text-ink-soft">{a.meaning}</div>
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </Section>
       );
 
@@ -254,45 +284,22 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
       if (!service.deliverables?.length) return null;
       return (
         <Section key={key} band="tint">
-          <SectionHead title={service.inputs ? "What goes in, what comes out" : "What you receive"} />
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-            {service.inputs && (
-              <>
-                <div className="lg:col-span-4 rounded-2xl border border-black/5 bg-cream-50 p-6">
-                  <div className="kicker mb-5">What we need from you</div>
-                  <ul className="space-y-4">
-                    {service.inputs.map((i) => (
-                      <li key={i.title} className="flex items-center gap-4 text-[0.92rem] text-ink">
-                        <GlyphTile name={i.glyph} size="sm" />
-                        {i.title}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div aria-hidden className="hidden lg:flex lg:col-span-1 flex-col items-center justify-center gap-2 text-navy">
-                  <span className="text-[0.6rem] tracking-[0.14em] uppercase text-ink-muted [writing-mode:vertical-rl] rotate-180">IndiskaAI analysis</span>
-                  <span className="text-2xl text-gold-600">→</span>
-                </div>
-              </>
-            )}
-            {/* Deliverables framed as a results window, so outputs read as artefacts rather than a list. */}
-            <div className={`${service.inputs ? "lg:col-span-7" : "lg:col-span-12"} overflow-hidden rounded-2xl border border-black/10 bg-cream-50 shadow-[0_24px_60px_-40px_rgba(16,53,101,0.45)]`}>
-              <div className="flex items-center gap-2 border-b border-black/5 bg-cream-100 px-4 py-2.5">
-                <span className="h-2 w-2 rounded-full bg-black/15" />
-                <span className="h-2 w-2 rounded-full bg-black/15" />
-                <span className="h-2 w-2 rounded-full bg-gold" />
-                <span className="ml-2 text-[0.66rem] tracking-[0.12em] uppercase text-ink-muted">Deliverables</span>
-              </div>
-              <ul className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-black/5">
-                {service.deliverables.map((d) => (
-                  <li key={d.title} className="flex flex-col gap-3 bg-cream-50 p-5">
-                    <Glyph name={d.glyph} className="h-10 w-10" />
-                    <span className="text-[0.88rem] leading-[1.35] text-ink">{d.title}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <InputsOutputs
+            inputs={service.inputs}
+            process={service.ioProcess}
+            outputs={service.deliverables}
+            inputsNote={service.inputsNote}
+            outputsExtra={
+              service.ioGraphs ? (
+                <>
+                  <OutputGraphs />
+                  <p className="px-4 py-2.5 text-[0.72rem] text-ink-muted border-t border-black/5">
+                    Illustrative output formats — generated for display, not results from any project.
+                  </p>
+                </>
+              ) : undefined
+            }
+          />
         </Section>
       );
 
@@ -339,7 +346,7 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
         <Section key={key}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <h2 className="lg:col-span-4 font-display text-[clamp(1.6rem,3.5vw,2.4rem)] leading-[1.05] tracking-tightest text-ink">
-              Common questions
+              {service.faqTitle ?? "Common questions"}
             </h2>
             <div className="lg:col-span-8">
               <FaqList faqs={service.faqs} />

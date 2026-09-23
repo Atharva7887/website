@@ -911,6 +911,386 @@ export function CoverageTrack() {
   );
 }
 
+/* ─────────────────────── Dynamics & candidate evaluation ─────────────── */
+
+const BACKBONE = "M22 96 C40 70 58 64 74 80 C90 96 104 60 122 58 C140 56 150 88 168 86 C186 84 198 60 218 66";
+
+/** An ensemble of trajectory frames: the core overlaps, loops and termini spread. */
+export function StructuralFluctuation() {
+  const frames = [
+    { d: "M22 104 C40 74 58 66 74 80 C90 96 104 50 122 50 C140 50 150 90 168 88 C186 86 196 50 218 52", o: 0.32 },
+    { d: "M22 86 C40 66 58 62 74 80 C90 96 104 70 122 66 C140 62 150 86 168 84 C186 82 200 72 218 82", o: 0.32 },
+    { d: BACKBONE, o: 1 },
+  ];
+  const rmsf = [8, 14, 6, 4, 5, 18, 26, 12, 5, 4, 6, 9, 20, 30];
+  return (
+    <Svg>
+      {frames.map((f, i) => (
+        <path
+          key={i}
+          className={i < 2 ? "sci-wobble" : undefined}
+          style={i === 1 ? { animationDelay: "-1.6s" } : undefined}
+          d={f.d}
+          stroke={i === 2 ? NAVY : NAVY}
+          strokeOpacity={f.o}
+          strokeWidth={i === 2 ? 4 : 3}
+          {...S}
+        />
+      ))}
+      <circle cx="122" cy="58" r="5" fill={GOLD} stroke={INK} strokeWidth="1.1" />
+      <path d="M22 146 L218 146" stroke={INK_LINE} strokeWidth="1.1" {...S} />
+      {rmsf.map((h, i) => (
+        <rect key={i} x={24 + i * 14} y={146 - h} width="9" height={h} rx="2" fill={h > 16 ? GOLD : NAVY_FILL_2} stroke={h > 16 ? GOLD : NAVY} strokeWidth="0.8" />
+      ))}
+    </Svg>
+  );
+}
+
+/** One static structure opening into several conformational states. */
+export function ConformationalStates() {
+  return (
+    <Svg>
+      <ellipse cx="46" cy="80" rx="26" ry="30" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1.6" />
+      <path d="M78 80 L100 80" stroke={GOLD} strokeWidth="1.8" {...S} />
+      <path d="M94 74 L100 80 L94 86" stroke={GOLD} strokeWidth="1.8" {...S} />
+      <ellipse cx="150" cy="44" rx="24" ry="20" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" />
+      <path className="sci-drift" d="M168 44 C182 34 196 40 204 30" stroke={NAVY} strokeWidth="2" {...S} />
+      <ellipse cx="160" cy="84" rx="30" ry="18" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.8" />
+      <ellipse cx="146" cy="126" rx="22" ry="22" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" />
+      <path d="M168 126 C186 132 196 120 210 126" stroke={NAVY} strokeWidth="2" {...S} />
+      <path d="M104 80 C114 60 120 48 124 46 M104 80 L128 84 M104 80 C114 104 118 120 124 124" stroke={INK_LINE} strokeWidth="1.2" strokeDasharray="3 4" {...S} />
+    </Svg>
+  );
+}
+
+/** Three candidates, three persistence traces: one holds, two fade. */
+export function CandidateCompare() {
+  const rows = [
+    { y: 36, d: "M70 40 C90 36 110 42 130 38 C150 34 170 40 214 37", good: true, label: "A" },
+    { y: 80, d: "M70 76 C90 90 110 74 130 88 C150 100 170 82 214 94", good: false, label: "B" },
+    { y: 124, d: "M70 118 C84 124 98 138 118 142 C140 146 170 146 214 146", good: false, label: "C" },
+  ];
+  return (
+    <Svg>
+      {rows.map((r) => (
+        <g key={r.label}>
+          <rect x="22" y={r.y - 14} width="30" height="28" rx="7" fill={r.good ? GOLD : NAVY_FILL} stroke={r.good ? INK : NAVY} strokeWidth="1.2" />
+          <text x="37" y={r.y + 5} textAnchor="middle" fontSize="13" fontFamily="var(--font-inter), sans-serif" fill={INK}>{r.label}</text>
+          <path d={`M66 ${r.y + 16} L218 ${r.y + 16}`} stroke={INK_LINE} strokeWidth="0.9" strokeDasharray="2 4" {...S} />
+          <path d={r.d} stroke={r.good ? NAVY : "rgba(26,26,26,0.38)"} strokeWidth={r.good ? 2.4 : 1.8} {...S} />
+        </g>
+      ))}
+    </Svg>
+  );
+}
+
+/** Compound library streaming toward a target pocket; one settles in. */
+export function VirtualScreening() {
+  const lib = [[30, 34], [52, 24], [40, 58], [64, 46], [28, 86], [56, 78], [44, 112], [66, 104], [34, 132]];
+  return (
+    <Svg>
+      <path
+        d="M226 52 C224 62 224 68 222 72 C208 78 180 74 180 84 C180 94 208 90 222 96 C224 100 224 106 226 112 C222 132 188 144 156 139 C132 135 118 116 118 84 C118 52 140 24 172 24 C206 24 226 36 226 52 Z"
+        fill={NAVY_FILL}
+        stroke={NAVY}
+        strokeWidth="1.6"
+        {...S}
+      />
+      {lib.map(([x, y], i) => (
+        <path
+          key={i}
+          d={`M${x} ${y - 7} L${x + 6} ${y - 3.5} L${x + 6} ${y + 3.5} L${x} ${y + 7} L${x - 6} ${y + 3.5} L${x - 6} ${y - 3.5} Z`}
+          fill={i === 3 ? GOLD_FILL : "rgba(26,26,26,0.05)"}
+          stroke={i === 3 ? GOLD : INK_LINE}
+          strokeWidth="1.2"
+        />
+      ))}
+      <path d="M80 84 C110 84 140 84 170 84" stroke={GOLD} strokeWidth="1.4" strokeDasharray="3 5" {...S} />
+      <g className="sci-enter">
+        <path d="M200 77 L207 81 L207 88 L200 92 L193 88 L193 81 Z" fill={GOLD} stroke={INK} strokeWidth="1.1" />
+      </g>
+    </Svg>
+  );
+}
+
+/** Predicted-score ranking: bar length is the computational score, not a measured affinity. */
+export function CandidateRanking() {
+  const bars = [
+    { l: "A", w: 150 },
+    { l: "B", w: 118 },
+    { l: "C", w: 86 },
+    { l: "D", w: 58 },
+  ];
+  return (
+    <Svg>
+      <text x="24" y="22" fontSize="9" letterSpacing="1.4" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">PREDICTED SCORE</text>
+      {bars.map((b, i) => (
+        <g key={b.l}>
+          <text x="30" y={50 + i * 28} textAnchor="middle" fontSize="12" fontFamily="var(--font-inter), sans-serif" fill={INK}>{b.l}</text>
+          <rect x="44" y={38 + i * 28} width={b.w} height="16" rx="4" fill={i === 0 ? GOLD : NAVY_FILL_2} stroke={i === 0 ? GOLD : NAVY} strokeWidth="1" />
+        </g>
+      ))}
+      <path d="M44 32 L44 150" stroke={INK_LINE} strokeWidth="1.1" {...S} />
+    </Svg>
+  );
+}
+
+/** Biological data narrowing through pathway signals to a few candidate targets. */
+export function TargetIdentification() {
+  const pts = [[26, 30], [40, 52], [30, 76], [48, 98], [28, 120], [44, 136], [58, 40], [60, 116]];
+  const path = [[110, 44], [128, 80], [110, 116]];
+  return (
+    <Svg>
+      {pts.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="4.5" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1" />
+      ))}
+      <path d="M72 80 L92 80" stroke={GOLD} strokeWidth="1.6" {...S} />
+      <path d="M88 75 L93 80 L88 85" stroke={GOLD} strokeWidth="1.6" {...S} />
+      <path d="M110 44 L128 80 L110 116 M128 80 L156 80" stroke={INK_LINE} strokeWidth="1.4" {...S} />
+      {path.map(([x, y]) => (
+        <circle key={`${x}${y}`} cx={x} cy={y} r="7" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" />
+      ))}
+      <circle cx="128" cy="80" r="8" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.6" />
+      <path d="M156 80 L176 80" stroke={GOLD} strokeWidth="1.6" {...S} />
+      <path d="M172 75 L177 80 L172 85" stroke={GOLD} strokeWidth="1.6" {...S} />
+      <circle className="sci-pulse" cx="200" cy="62" r="12" fill={GOLD_FILL} stroke={GOLD} strokeWidth="2" />
+      <circle cx="200" cy="62" r="4.5" fill={GOLD} />
+      <circle cx="200" cy="104" r="10" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" />
+    </Svg>
+  );
+}
+
+/** Antibody and an engineered variant overlaid for structural comparison. */
+export function BiologicsEngineering() {
+  return (
+    <Svg>
+      <g transform="translate(70 90) scale(0.9)">
+        <path d="M0 40 L-40 -10" stroke={NAVY} strokeWidth="9" {...S} />
+        <path d="M0 40 L40 -10" stroke={NAVY} strokeWidth="9" {...S} />
+        <path d="M0 40 L0 80" stroke={NAVY} strokeWidth="11" {...S} />
+        <circle cx="-40" cy="-12" r="7" fill={GOLD} stroke={INK} strokeWidth="1.3" />
+        <circle cx="40" cy="-12" r="7" fill={GOLD} stroke={INK} strokeWidth="1.3" />
+      </g>
+      <path d="M118 80 L138 80" stroke={GOLD} strokeWidth="1.8" {...S} />
+      <path d="M132 74 L138 80 L132 86" stroke={GOLD} strokeWidth="1.8" {...S} />
+      <g transform="translate(180 90) scale(0.9)">
+        <path d="M0 40 L-40 -10 M0 40 L40 -10 M0 40 L0 80" stroke={NAVY} strokeOpacity="0.28" strokeWidth="9" {...S} />
+        <path d="M0 40 L-36 -14" stroke={NAVY} strokeWidth="4" strokeDasharray="4 4" {...S} />
+        <path d="M0 40 L44 -6" stroke={NAVY} strokeWidth="4" strokeDasharray="4 4" {...S} />
+        <circle cx="-36" cy="-16" r="7" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.8" />
+        <circle cx="44" cy="-8" r="7" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.8" />
+      </g>
+    </Svg>
+  );
+}
+
+/** A small analysis panel: deviation and per-residue fluctuation traces. */
+export function TrajectoryAnalysis() {
+  return (
+    <Svg>
+      <rect x="18" y="16" width="204" height="60" rx="6" fill="rgba(250,247,240,0.9)" stroke={INK_LINE} strokeWidth="1" />
+      <path d="M28 66 C44 60 52 34 70 32 C88 30 110 34 130 32 C150 30 180 34 212 31" stroke={NAVY} strokeWidth="2" {...S} />
+      <rect x="18" y="86" width="204" height="60" rx="6" fill="rgba(250,247,240,0.9)" stroke={INK_LINE} strokeWidth="1" />
+      <path d="M28 136 L40 128 L50 134 L60 110 L70 132 L84 130 L96 134 L108 104 L118 128 L132 132 L148 130 L160 116 L172 134 L188 132 L200 98 L212 128" stroke={GOLD} strokeWidth="1.8" {...S} />
+    </Svg>
+  );
+}
+
+/* ─────────────────────────── Oncology genomics ───────────────────────── */
+
+const MONO = "ui-monospace, SFMono-Regular, Menlo, monospace";
+
+/** Tumour tissue with atypical cells, feeding a targeted gene panel. */
+export function TumourPanel() {
+  const cells = [
+    [40, 44, 0], [62, 36, 0], [84, 48, 1], [46, 70, 0], [70, 66, 1], [92, 76, 1],
+    [38, 96, 0], [62, 96, 0], [86, 104, 1], [50, 122, 0], [74, 124, 0],
+  ];
+  const genes = [44, 70, 96, 122];
+  return (
+    <Svg>
+      <path d="M22 56 C20 30 60 18 90 26 C118 34 124 70 116 100 C108 132 70 146 42 136 C18 126 24 82 22 56 Z" fill="rgba(244,196,48,0.10)" stroke={NAVY} strokeWidth="1.5" {...S} />
+      {cells.map(([x, y, t], i) => (
+        <g key={i}>
+          <circle cx={x} cy={y} r={t ? 9 : 8} fill={t ? GOLD_FILL : "rgba(250,247,240,0.9)"} stroke={t ? GOLD : NAVY} strokeWidth="1.1" />
+          <circle cx={x + (t ? 1 : 0)} cy={y} r={t ? 4.2 : 3} fill={t ? GOLD : NAVY_FILL_2} />
+        </g>
+      ))}
+      <path d="M128 80 L146 80" stroke={GOLD} strokeWidth="1.8" {...S} />
+      <path d="M140 74 L146 80 L140 86" stroke={GOLD} strokeWidth="1.8" {...S} />
+      {genes.map((y, i) => (
+        <g key={y}>
+          <path d={`M156 ${y} L220 ${y}`} stroke={NAVY} strokeWidth="1.6" {...S} />
+          <rect x={166 + (i % 2) * 10} y={y - 5} width="26" height="10" rx="3" fill={GOLD} stroke={INK} strokeWidth="0.8" />
+        </g>
+      ))}
+    </Svg>
+  );
+}
+
+function Bases({ y, seq, hot = [], gap = [] }: { y: number; seq: string; hot?: number[]; gap?: number[] }) {
+  return (
+    <g>
+      {seq.split("").map((b, i) => {
+        const isGap = gap.includes(i);
+        const isHot = hot.includes(i);
+        return (
+          <g key={i}>
+            <rect x={28 + i * 23} y={y} width="19" height="26" rx="4" fill={isHot ? GOLD : isGap ? "rgba(26,26,26,0.04)" : NAVY_FILL} stroke={isHot ? INK : isGap ? INK_LINE : NAVY} strokeWidth="1" strokeDasharray={isGap ? "3 3" : undefined} />
+            <text x={37.5 + i * 23} y={y + 18} textAnchor="middle" fontSize="13" fontFamily={MONO} fill={isGap ? "#9A9A9A" : INK}>{isGap ? "–" : b}</text>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** Reference vs variant: one base changed. */
+export function SnvChange() {
+  return (
+    <Svg>
+      <text x="28" y="34" fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">REFERENCE</text>
+      <Bases y={40} seq="ACTGACG" />
+      <text x="28" y="100" fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">VARIANT</text>
+      <Bases y={106} seq="ACCGACG" hot={[2]} />
+      <path d="M83.5 68 L83.5 104" stroke={GOLD} strokeWidth="1.4" strokeDasharray="2 3" {...S} />
+    </Svg>
+  );
+}
+
+/** Reference vs variant: three bases deleted. */
+export function IndelChange() {
+  return (
+    <Svg>
+      <text x="28" y="34" fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">REFERENCE</text>
+      <Bases y={40} seq="ACGTACGT" hot={[4, 5]} />
+      <text x="28" y="100" fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">VARIANT · DELETION</text>
+      <Bases y={106} seq="ACGTACGT" gap={[4, 5]} />
+    </Svg>
+  );
+}
+
+/** Normal, amplified and deleted copy number shown as coverage depth. */
+export function CopyNumber() {
+  const rows = [
+    { l: "NORMAL", w: 84, c: NAVY_FILL_2, s: NAVY },
+    { l: "AMPLIFICATION", w: 176, c: GOLD, s: INK },
+    { l: "DELETION", w: 40, c: "rgba(26,26,26,0.08)", s: INK_LINE },
+  ];
+  return (
+    <Svg>
+      {rows.map((r, i) => (
+        <g key={r.l}>
+          <text x="28" y={30 + i * 44} fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">{r.l}</text>
+          <rect x="28" y={36 + i * 44} width={r.w} height="16" rx="4" fill={r.c} stroke={r.s} strokeWidth="1" />
+        </g>
+      ))}
+    </Svg>
+  );
+}
+
+/** Two genes joined at a breakpoint into a fusion. */
+export function GeneFusion() {
+  return (
+    <Svg>
+      <rect x="22" y="34" width="70" height="20" rx="5" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1.3" />
+      <text x="57" y="48" textAnchor="middle" fontSize="11" fontFamily="var(--font-inter), sans-serif" fill={INK}>Gene A</text>
+      <rect x="22" y="106" width="70" height="20" rx="5" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.3" />
+      <text x="57" y="120" textAnchor="middle" fontSize="11" fontFamily="var(--font-inter), sans-serif" fill={INK}>Gene B</text>
+      <path d="M92 44 C120 44 116 80 138 80 M92 116 C120 116 116 80 138 80" stroke={INK_LINE} strokeWidth="1.5" {...S} />
+      <rect x="138" y="68" width="42" height="24" rx="5" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1.3" />
+      <rect x="180" y="68" width="42" height="24" rx="5" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.3" />
+      <path d="M180 62 L180 98" stroke={INK} strokeWidth="1.6" strokeDasharray="2 2" {...S} />
+      <text x="180" y="112" textAnchor="middle" fontSize="8.5" letterSpacing="1" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">BREAKPOINT</text>
+    </Svg>
+  );
+}
+
+/** Screening: many panel regions, a few hotspot positions checked. */
+export function HotspotScreening() {
+  return (
+    <Svg>
+      {[36, 64, 92, 120].map((y, r) => (
+        <g key={y}>
+          <path d={`M24 ${y} L216 ${y}`} stroke={NAVY} strokeOpacity="0.35" strokeWidth="6" {...S} />
+          {[0, 1, 2, 3, 4, 5].map((c) => {
+            const hot = (r === 0 && c === 2) || (r === 1 && c === 4) || (r === 3 && c === 1);
+            return <circle key={c} cx={40 + c * 32} cy={y} r={hot ? 7 : 3} fill={hot ? GOLD : NAVY} stroke={hot ? INK : "none"} strokeWidth="1" />;
+          })}
+        </g>
+      ))}
+      <circle className="sci-pulse" cx="104" cy="36" r="12" stroke={GOLD} strokeWidth="1.5" />
+    </Svg>
+  );
+}
+
+/** Tumour-only: candidate calls filtered against population and panel-of-normals resources. */
+export function TumourOnly() {
+  const calls = [[34, 40], [58, 30], [46, 62], [70, 54], [36, 88], [62, 84], [50, 112], [74, 118]];
+  return (
+    <Svg>
+      {calls.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="5" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1" />
+      ))}
+      <path d="M96 30 L150 30 L136 80 L136 132 L110 132 L110 80 Z" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" {...S} />
+      <text x="123" y="60" textAnchor="middle" fontSize="7.5" letterSpacing="0.8" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">FILTERS</text>
+      <path d="M152 80 L172 80" stroke={GOLD} strokeWidth="1.6" {...S} />
+      <path d="M166 75 L172 80 L166 85" stroke={GOLD} strokeWidth="1.6" {...S} />
+      {[64, 96].map((y) => (
+        <circle key={y} cx="196" cy={y} r="8" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.6" strokeDasharray="3 2" />
+      ))}
+      <text x="196" y="124" textAnchor="middle" fontSize="7.5" letterSpacing="0.8" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">LIKELY</text>
+    </Svg>
+  );
+}
+
+/** Tumour and matched normal aligned for direct comparison. */
+export function TumourNormal() {
+  const tumour = [3, 6, 9];
+  const normal = [6];
+  return (
+    <Svg>
+      <text x="22" y="40" fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">TUMOUR</text>
+      <text x="22" y="100" fontSize="9" letterSpacing="1.2" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">NORMAL</text>
+      {[48, 108].map((y, row) => (
+        <g key={y}>
+          <path d={`M22 ${y} L218 ${y}`} stroke={NAVY} strokeWidth="2.4" {...S} />
+          {(row === 0 ? tumour : normal).map((i) => (
+            <circle key={i} cx={22 + i * 19} cy={y} r="6" fill={row === 0 && i !== 6 ? GOLD : NAVY_FILL_2} stroke={row === 0 && i !== 6 ? INK : NAVY} strokeWidth="1.1" />
+          ))}
+        </g>
+      ))}
+      {tumour.map((i) => (
+        <path key={i} d={`M${22 + i * 19} 56 L${22 + i * 19} 100`} stroke={i === 6 ? INK_LINE : GOLD} strokeWidth="1.2" strokeDasharray="2 3" {...S} />
+      ))}
+      <text x="22" y="140" fontSize="8.5" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">Gold: tumour only · grey link: shared (inherited)</text>
+    </Svg>
+  );
+}
+
+/** Variant allele fraction across timepoints: persisting, clearing, emerging. */
+export function VariantTrajectory() {
+  const xs = [48, 120, 192];
+  return (
+    <Svg>
+      <path d="M30 20 L30 128 L214 128" stroke={INK_LINE} strokeWidth="1.2" {...S} />
+      {xs.map((x, i) => (
+        <g key={x}>
+          <path d={`M${x} 124 L${x} 132`} stroke={INK_LINE} strokeWidth="1.2" {...S} />
+          <text x={x} y="146" textAnchor="middle" fontSize="10" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">T{i + 1}</text>
+        </g>
+      ))}
+      <path d="M48 48 L120 52 L192 50" stroke={NAVY} strokeWidth="2.2" {...S} />
+      <path d="M48 70 L120 100 L192 120" stroke="rgba(26,26,26,0.35)" strokeWidth="2" strokeDasharray="4 3" {...S} />
+      <path d="M48 124 L120 96 L192 40" stroke={GOLD} strokeWidth="2.4" {...S} />
+      {[[192, 50, NAVY], [192, 120, "rgba(26,26,26,0.35)"], [192, 40, GOLD]].map(([x, y, c]) => (
+        <circle key={`${y}`} cx={x as number} cy={y as number} r="4.5" fill={c as string} stroke={INK} strokeWidth="0.8" />
+      ))}
+      <text x="40" y="16" fontSize="8.5" letterSpacing="1" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">VAF</text>
+    </Svg>
+  );
+}
+
 /* ───────────────────────────────── Registry ───────────────────────────── */
 
 export const ILLUSTRATIONS = {
@@ -949,6 +1329,23 @@ export const ILLUSTRATIONS = {
   sampleMatrix: SampleMatrix,
   validationFolds: ValidationFolds,
   exomeCapture: ExomeCapture,
+  structuralFluctuation: StructuralFluctuation,
+  conformationalStates: ConformationalStates,
+  candidateCompare: CandidateCompare,
+  virtualScreening: VirtualScreening,
+  candidateRanking: CandidateRanking,
+  targetIdentification: TargetIdentification,
+  biologicsEngineering: BiologicsEngineering,
+  trajectoryAnalysis: TrajectoryAnalysis,
+  tumourPanel: TumourPanel,
+  snvChange: SnvChange,
+  indelChange: IndelChange,
+  copyNumber: CopyNumber,
+  geneFusion: GeneFusion,
+  hotspotScreening: HotspotScreening,
+  tumourOnly: TumourOnly,
+  tumourNormal: TumourNormal,
+  variantTrajectory: VariantTrajectory,
   coverageTrack: CoverageTrack,
 } as const;
 

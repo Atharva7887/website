@@ -74,7 +74,7 @@ export default function Hero() {
           className="kicker"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold mr-2 align-middle" />
-          AI-accelerated antibody discovery
+          AI-assisted computational biology
         </motion.div>
 
         <motion.h1
@@ -113,12 +113,12 @@ export default function Hero() {
           </span>
           ,
           <br />
-          accelerated.
+          AI-assisted.
         </motion.h1>
 
         <TextReveal
           as="p"
-          text="IndiskaAI builds antibody libraries and intelligent discovery platforms, combining molecular engineering, AI-driven data analysis, and modern sequencing technology to help biopharma partners find promising candidates faster."
+          text="IndiskaAI builds antibody libraries and intelligent discovery platforms, combining molecular engineering, AI-driven data analysis, and modern sequencing technology to help biopharma partners identify and prioritise promising candidates."
           className="mt-8 max-w-[46ch] text-[1.06rem] md:text-[1.15rem] leading-[1.55] text-ink-soft"
           delay={0.4}
         />

@@ -7,9 +7,10 @@ import PendingContent, { SHOW_PENDING } from "@/components/PendingContent";
 import MotionStory from "@/components/science/MotionStory";
 import ScienceFigure from "@/components/science/ScienceFigure";
 import VisualPipeline from "@/components/science/VisualPipeline";
-import Glyph, { GlyphTile, type GlyphName } from "@/components/science/Glyphs";
+import { GlyphTile, type GlyphName } from "@/components/science/Glyphs";
 import type { IllustrationName } from "@/components/science/Illustrations";
-import { Section, SectionHead, FaqList, ServiceCTA } from "@/components/service/ServiceSections";
+import { Section, SectionHead, FaqList, ServiceCTA, InputsOutputs, type IoItem } from "@/components/service/ServiceSections";
+import GenomicsNav from "@/components/service/GenomicsNav";
 import WesRequestForm, { SelectTestButton } from "@/components/service/WesRequestForm";
 import { getService } from "@/lib/services-data";
 
@@ -52,7 +53,7 @@ const APPLICATIONS: { title: string; body: string; glyph: GlyphName }[] = [
   { title: "Management & research decisions", body: "Findings may inform downstream clinical or research decisions, when interpreted appropriately.", glyph: "objective" },
 ];
 
-const DELIVERABLES: { title: string; glyph: GlyphName }[] = [
+const DELIVERABLES: IoItem[] = [
   { title: "QC summary", glyph: "qc" },
   { title: "Processed alignments", glyph: "align" },
   { title: "Annotated variant calls", glyph: "annotate" },
@@ -60,6 +61,56 @@ const DELIVERABLES: { title: string; glyph: GlyphName }[] = [
   { title: "Inheritance analysis (duo / trio)", glyph: "inheritance" },
   { title: "Interpreted report", glyph: "report" },
 ];
+
+const INPUTS: IoItem[] = [
+  { title: "FASTQ files", glyph: "fastq" },
+  { title: "BAM / CRAM", glyph: "align" },
+  { title: "VCF", glyph: "variant" },
+  { title: "Capture kit / target regions", glyph: "target" },
+  { title: "Reference genome build", glyph: "dna" },
+  { title: "Phenotype or research question (no identifiers)", glyph: "person" },
+  { title: "Parental samples for duo / trio", glyph: "inheritance" },
+];
+
+/** Example report layout — placeholder entries only, never patient data. */
+function WesReportMock() {
+  return (
+    <figure>
+      <div className="p-5" aria-hidden>
+        <div className="grid grid-cols-3 gap-3">
+          {[["Mean depth", 78], ["≥20× coverage", 92], ["Reads passing QC", 96]].map(([k, v]) => (
+            <div key={k} className="rounded-lg bg-cream-100 p-3">
+              <div className="text-[0.6rem] tracking-[0.1em] uppercase text-ink-muted">{k}</div>
+              <div className="mt-2 h-1.5 rounded-full bg-black/10"><div className="h-1.5 rounded-full bg-navy" style={{ width: `${v}%` }} /></div>
+            </div>
+          ))}
+        </div>
+        <table className="mt-4 w-full text-left text-[0.78rem]">
+          <thead className="text-[0.6rem] tracking-[0.1em] uppercase text-ink-muted">
+            <tr><th className="py-2 font-medium">Gene</th><th className="py-2 font-medium">Variant</th><th className="py-2 font-medium hidden sm:table-cell">Inheritance</th><th className="py-2 font-medium">Classification</th></tr>
+          </thead>
+          <tbody className="text-ink">
+            {[
+              ["Gene A", "c.•••>•", "De novo", "Likely pathogenic", "bg-gold/40"],
+              ["Gene B", "c.•••del", "Inherited", "Uncertain significance", "bg-navy/15"],
+              ["Gene C", "c.•••+•", "Inherited", "Likely benign", "bg-black/[0.06]"],
+            ].map(([g, v, inh, cls, tone]) => (
+              <tr key={g} className="border-t border-black/[0.06]">
+                <td className="py-2.5 font-medium">{g}</td>
+                <td className="py-2.5 font-mono text-ink-soft">{v}</td>
+                <td className="py-2.5 hidden sm:table-cell text-ink-soft">{inh}</td>
+                <td className="py-2.5"><span className={`rounded-full px-2 py-0.5 text-[0.7rem] ${tone}`}>{cls}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <figcaption className="border-t border-black/5 px-5 py-3 text-[0.72rem] text-ink-muted">
+        Example report layout with placeholder entries — not patient data or a real result.
+      </figcaption>
+    </figure>
+  );
+}
 
 type Faq = { q: string; a: React.ReactNode; pending?: boolean };
 
@@ -122,6 +173,8 @@ export default function WesPage() {
           />
         }
       />
+
+      <GenomicsNav current="/services/genomics" />
 
       {/* Overview: what an exome covers, shown before it's explained. */}
       <Section>
@@ -196,60 +249,15 @@ export default function WesPage() {
         </div>
       </Section>
 
-      {/* What you receive: deliverables beside an example report layout. */}
+      {/* What comes in → what goes out; the example report sits inside the output window. */}
       <Section band="tint">
-        <SectionHead title="What you receive" />
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <ul className="lg:col-span-5 grid grid-cols-2 gap-3">
-            {DELIVERABLES.map((d) => (
-              <li key={d.title} className="flex flex-col gap-3 rounded-2xl border border-black/[0.06] bg-cream-50 p-4">
-                <Glyph name={d.glyph} className="h-9 w-9" />
-                <span className="text-[0.88rem] leading-snug text-ink">{d.title}</span>
-              </li>
-            ))}
-          </ul>
-
-          <figure className="lg:col-span-7 overflow-hidden rounded-2xl border border-black/10 bg-cream-50 shadow-[0_24px_60px_-40px_rgba(16,53,101,0.45)]">
-            <div className="flex items-center gap-2 border-b border-black/5 bg-cream-100 px-4 py-2.5">
-              <span className="h-2 w-2 rounded-full bg-black/15" />
-              <span className="h-2 w-2 rounded-full bg-black/15" />
-              <span className="h-2 w-2 rounded-full bg-gold" />
-              <span className="ml-2 text-[0.64rem] tracking-[0.12em] uppercase text-ink-muted">Variant report · example layout</span>
-            </div>
-            <div className="p-5" aria-hidden>
-              <div className="grid grid-cols-3 gap-3">
-                {[["Mean depth", 78], ["≥20× coverage", 92], ["Reads passing QC", 96]].map(([k, v]) => (
-                  <div key={k} className="rounded-lg bg-cream-100 p-3">
-                    <div className="text-[0.6rem] tracking-[0.1em] uppercase text-ink-muted">{k}</div>
-                    <div className="mt-2 h-1.5 rounded-full bg-black/10"><div className="h-1.5 rounded-full bg-navy" style={{ width: `${v}%` }} /></div>
-                  </div>
-                ))}
-              </div>
-              <table className="mt-4 w-full text-left text-[0.78rem]">
-                <thead className="text-[0.6rem] tracking-[0.1em] uppercase text-ink-muted">
-                  <tr><th className="py-2 font-medium">Gene</th><th className="py-2 font-medium">Variant</th><th className="py-2 font-medium hidden sm:table-cell">Inheritance</th><th className="py-2 font-medium">Classification</th></tr>
-                </thead>
-                <tbody className="text-ink">
-                  {[
-                    ["Gene A", "c.•••>•", "De novo", "Likely pathogenic", "bg-gold/40"],
-                    ["Gene B", "c.•••del", "Inherited", "Uncertain significance", "bg-navy/15"],
-                    ["Gene C", "c.•••+•", "Inherited", "Likely benign", "bg-black/[0.06]"],
-                  ].map(([g, v, inh, cls, tone]) => (
-                    <tr key={g} className="border-t border-black/[0.06]">
-                      <td className="py-2.5 font-medium">{g}</td>
-                      <td className="py-2.5 font-mono text-ink-soft">{v}</td>
-                      <td className="py-2.5 hidden sm:table-cell text-ink-soft">{inh}</td>
-                      <td className="py-2.5"><span className={`rounded-full px-2 py-0.5 text-[0.7rem] ${tone}`}>{cls}</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <figcaption className="border-t border-black/5 px-5 py-3 text-[0.72rem] text-ink-muted">
-              Example layout with placeholder entries — not patient data or a real result.
-            </figcaption>
-          </figure>
-        </div>
+        <InputsOutputs
+          inputs={INPUTS}
+          process={["QC & alignment", "Variant calling", "Annotation & classification"]}
+          outputs={DELIVERABLES}
+          inputsNote="Not sure what files you have? Our team can review the available data and confirm what can be analysed."
+          outputsExtra={<WesReportMock />}
+        />
       </Section>
 
       {/* Applications */}
