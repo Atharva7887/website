@@ -946,19 +946,30 @@ export function StructuralFluctuation() {
   );
 }
 
-/** One static structure opening into several conformational states. */
-export function ConformationalStates() {
+/** One static structure → movement → three conformational states, with the state visited over time beneath. */
+export function ConformationalEnsemble() {
+  const stat = "M14 70 C22 44 36 40 44 56 C52 72 62 44 72 50";
+  const states = [
+    { d: "M124 58 C134 30 150 26 160 44 C170 62 184 30 198 34 C210 38 214 52 224 46", c: NAVY, o: 1, cls: "" },
+    { d: "M124 64 C134 44 150 44 160 58 C170 72 184 60 198 66 C210 72 214 84 224 80", c: GOLD, o: 1, cls: "sci-wobble" },
+    { d: "M124 52 C134 22 150 14 160 32 C170 50 184 20 198 20 C210 20 214 30 224 22", c: NAVY, o: 0.35, cls: "sci-wobble" },
+  ];
   return (
     <Svg>
-      <ellipse cx="46" cy="80" rx="26" ry="30" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1.6" />
-      <path d="M78 80 L100 80" stroke={GOLD} strokeWidth="1.8" {...S} />
-      <path d="M94 74 L100 80 L94 86" stroke={GOLD} strokeWidth="1.8" {...S} />
-      <ellipse cx="150" cy="44" rx="24" ry="20" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" />
-      <path className="sci-drift" d="M168 44 C182 34 196 40 204 30" stroke={NAVY} strokeWidth="2" {...S} />
-      <ellipse cx="160" cy="84" rx="30" ry="18" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.8" />
-      <ellipse cx="146" cy="126" rx="22" ry="22" fill={NAVY_FILL} stroke={NAVY} strokeWidth="1.4" />
-      <path d="M168 126 C186 132 196 120 210 126" stroke={NAVY} strokeWidth="2" {...S} />
-      <path d="M104 80 C114 60 120 48 124 46 M104 80 L128 84 M104 80 C114 104 118 120 124 124" stroke={INK_LINE} strokeWidth="1.2" strokeDasharray="3 4" {...S} />
+      <path d={stat} stroke={NAVY} strokeWidth="4" {...S} />
+      <text x="44" y="96" textAnchor="middle" fontSize="8.5" letterSpacing="1.1" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">STATIC</text>
+      <path d="M84 56 L108 56" stroke={GOLD} strokeWidth="1.8" {...S} />
+      <path d="M102 50 L108 56 L102 62" stroke={GOLD} strokeWidth="1.8" {...S} />
+      {states.map((s, i) => (
+        <path key={i} className={s.cls || undefined} style={i === 2 ? { animationDelay: "-1.6s" } : undefined} d={s.d} stroke={s.c} strokeOpacity={s.o} strokeWidth={i === 0 ? 3.4 : 2.8} {...S} />
+      ))}
+      <text x="174" y="96" textAnchor="middle" fontSize="8.5" letterSpacing="1.1" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">STATES</text>
+      <path d="M14 142 L226 142" stroke={INK_LINE} strokeWidth="1" {...S} />
+      {[112, 124, 136].map((y, i) => (
+        <text key={y} x="8" y={y + 3} fontSize="7" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">S{i + 1}</text>
+      ))}
+      <path d="M18 112 L60 112 L60 124 L96 124 L96 112 L130 112 L130 136 L162 136 L162 124 L198 124 L198 112 L226 112" stroke={NAVY} strokeWidth="1.6" {...S} />
+      <path className="sci-trace" d="M18 112 L60 112 L60 124 L96 124 L96 112 L130 112 L130 136 L162 136 L162 124 L198 124 L198 112 L226 112" stroke={GOLD} strokeWidth="1.8" {...S} />
     </Svg>
   );
 }
@@ -1330,7 +1341,7 @@ export const ILLUSTRATIONS = {
   validationFolds: ValidationFolds,
   exomeCapture: ExomeCapture,
   structuralFluctuation: StructuralFluctuation,
-  conformationalStates: ConformationalStates,
+  conformationalEnsemble: ConformationalEnsemble,
   candidateCompare: CandidateCompare,
   virtualScreening: VirtualScreening,
   candidateRanking: CandidateRanking,

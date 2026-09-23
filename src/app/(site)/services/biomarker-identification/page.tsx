@@ -596,7 +596,8 @@ export default function BiomarkerPage() {
 
       <ServiceCTA
         service={service}
-        title="Send us your study design and we'll tell you what is realistically discoverable in it."
+        title="Have a biomarker question?"
+        lede="Turn sequencing and multi-omics data into prioritised biomarker signatures with the evidence needed for downstream evaluation."
         ctaLabel="Partner with us"
         background="biomarkerNetwork"
       />

@@ -19,7 +19,9 @@ Pages follow SHOW → EXPLAIN → GUIDE: one-sentence copy, every card/step carr
 - `src/components/science/` — `Illustrations` (240×160 schematics), `Glyphs` (48×48 icons for steps/cards/deliverables), `MotionStory` (hero "video" built from schematics; pauses offscreen, reduced-motion aware), `VisualPipeline` (horizontal ≥lg, vertical timeline below), `PersistenceComparison` (MD, seeded illustrative curves).
 - Service detail pages are data-driven from `src/lib/services-data.ts`; each entry's `layout` sets section order so pages don't share one rhythm.
 - Positioning is **AI-assisted computational biology**, never "accelerated"/"faster". "GPU-accelerated" is allowed only as a technical statement about simulation infrastructure.
-- Service-page IA: "What we analyse" = concepts only (no charts). "What comes in → process → what goes out" (`inputs`, `ioProcess`, `deliverables`) holds outputs; example plots (`ioGraphs`, `OutputGraphs`) live only there and are labelled illustrative.
+- Service-page IA: "What comes in → process → what goes out" (`inputs`, `ioProcess`, `deliverables`, rendered by `InputsOutputs`) is used where it helps; the MD page deliberately has none — just a concise `deliverables` section.
+- MD "What we analyse" is `AnalysisExplorer`: desktop list + side panel (hover / focus / click), tap-to-expand accordion below `lg`. Illustrative plots come from `MdCharts.tsx` keyed by `chart`; always labelled illustrative.
+- Every service sets its own closing CTA (`ctaTitle` / `ctaDescription`, or props on custom pages) — never reuse one generic sentence.
 - Docking scores / predicted rankings are never called affinities; label them "predicted / computational".
 - No stock photography; all visuals are original SVG. Charts/frames are schematic and labelled as such.
 - Real imagery = `src/lib/media.ts` (asset inventory: source, licence, where used). Structure renders in `public/structures/` are drawn from CC0 PDB coordinates by `scripts/render-pdb.mjs` (raw .pdb not committed); rendered via `MediaFigure` with a credit link. `public/hero-video.mp4` is the owned antibody render (Antibody Discovery hero, `LoopVideo`).

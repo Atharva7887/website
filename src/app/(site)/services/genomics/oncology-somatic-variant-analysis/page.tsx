@@ -61,7 +61,7 @@ const ANALYSES: { name: string; body: string; art: IllustrationName; chain: stri
     name: "Tumour-Only Analysis",
     body: "For tumour data without a matched normal. Population databases, panels of normals and other filters help separate likely somatic from inherited variation, with the basis of each call documented.",
     art: "tumourOnly",
-    chain: ["Tumour", "Sequencing", "Filtering / annotation", "Likely somatic calls"],
+    chain: ["FASTQ", "Filtering / annotation", "Likely somatic calls"],
     note: "Calls are likely somatic — inferred, not experimentally confirmed.",
   },
   {
@@ -428,7 +428,8 @@ export default function OncologyPage() {
 
       <ServiceCTA
         service={service}
-        title={<>Have tumour panel data <span className="italic text-gold">to analyse?</span></>}
+        title={<>Have tumour sequencing data <span className="italic text-gold">to analyse?</span></>}
+        lede="Turn targeted oncology sequencing data into annotated and prioritised somatic variant findings for qualified clinical or research review."
         ctaHref="#request"
         ctaLabel="Request analysis"
         background="sequencingReads"

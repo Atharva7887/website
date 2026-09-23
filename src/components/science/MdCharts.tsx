@@ -1,8 +1,8 @@
 /**
- * The plot formats an MD engagement returns, drawn from seeded functions so
- * they are deterministic and obviously generic. They show what each analysis
- * *looks like*, never a result — the panel is labelled that way, and each
- * chart carries a text equivalent for screen readers.
+ * Illustrative MD analysis plots, drawn from seeded functions so they are
+ * deterministic and obviously generic. They show what each analysis *looks
+ * like*, never a result — the UI labels them "Illustrative", and each carries
+ * a text equivalent for screen readers.
  */
 
 const NAVY = "#1E5BA8";
@@ -18,10 +18,15 @@ function seeded(seed: number) {
   };
 }
 
+/** Stable pseudo-random in [0,1) for grid cells. */
+function hash(a: number, b: number) {
+  const h = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
+  return h - Math.floor(h);
+}
+
 const W = 220;
 const H = 70;
 
-/** Time-series in [0,1] from a shape function plus smoothed noise. */
 function series(shape: (t: number) => number, noise: number, seed: number, n = 80) {
   const rnd = seeded(seed);
   let s = 0;
@@ -57,20 +62,28 @@ const RMSF = [0.3, 0.22, 0.18, 0.2, 0.16, 0.5, 0.72, 0.4, 0.2, 0.15, 0.14, 0.18,
 const HBONDS = [0.95, 0.88, 0.62, 0.3, 0.12];
 const ENERGY = [-0.8, -0.55, -0.35, -0.2, 0.12, -0.1, -0.42];
 
-const CHARTS: { title: string; what: string; alt: string; chart: React.ReactNode }[] = [
-  {
-    title: "RMSD",
-    what: "Structural deviation over time",
-    alt: "Line rising early then plateauing, indicating the structure settles.",
+/** Two conformational basins in PC1/PC2 space, joined by a transition path. */
+const PCA_POINTS = Array.from({ length: 70 }).map((_, i) => {
+  const basin = i < 42 ? 0 : 1;
+  const cx = basin ? 160 : 62;
+  const cy = basin ? 24 : 46;
+  const a = hash(i, 3) * Math.PI * 2;
+  const r = Math.sqrt(hash(i, 7)) * (basin ? 18 : 24);
+  return { x: cx + Math.cos(a) * r * 1.4, y: cy + Math.sin(a) * r * 0.8, basin };
+});
+
+export type MdChartKey = "rmsd" | "rmsf" | "rg" | "sasa" | "hbonds" | "contacts" | "pca" | "energy";
+
+export const MD_CHARTS: Record<MdChartKey, { alt: string; chart: React.ReactNode }> = {
+  rmsd: {
+    alt: "Line rising early then plateauing, as the structure settles relative to the reference.",
     chart: (
       <Frame y="Å">
         <Line d={series((t) => 0.15 + 0.5 * (1 - Math.exp(-t * 8)), 0.12, 11)} />
       </Frame>
     ),
   },
-  {
-    title: "RMSF",
-    what: "Per-residue flexibility",
+  rmsf: {
     alt: "Bars low across the core with peaks at loop and terminal residues.",
     chart: (
       <Frame x="residue" y="Å">
@@ -80,29 +93,23 @@ const CHARTS: { title: string; what: string; alt: string; chart: React.ReactNode
       </Frame>
     ),
   },
-  {
-    title: "Radius of gyration",
-    what: "Compactness",
-    alt: "Flat line with small fluctuations, indicating a compact structure.",
+  rg: {
+    alt: "Near-flat line with small fluctuations, indicating a stable, compact structure.",
     chart: (
       <Frame y="nm">
         <Line d={series(() => 0.55, 0.08, 23)} />
       </Frame>
     ),
   },
-  {
-    title: "SASA",
-    what: "Solvent-accessible surface",
-    alt: "Line drifting slightly downward, indicating gradual burial.",
+  sasa: {
+    alt: "Line drifting slightly downward, indicating gradual burial of surface.",
     chart: (
       <Frame y="nm²">
         <Line d={series((t) => 0.7 - 0.2 * t, 0.12, 37)} />
       </Frame>
     ),
   },
-  {
-    title: "Hydrogen-bond persistence",
-    what: "Fraction of frames each H-bond is present",
+  hbonds: {
     alt: "Five horizontal bars decreasing from near-complete to rare occupancy.",
     chart: (
       <Frame x="occupancy" y="pair">
@@ -112,27 +119,34 @@ const CHARTS: { title: string; what: string; alt: string; chart: React.ReactNode
       </Frame>
     ),
   },
-  {
-    title: "Contact persistence",
-    what: "Residue contacts across the run",
-    alt: "Heat strip where some residue rows stay filled across time and others break up.",
+  contacts: {
+    alt: "Heat strip where the top residue rows stay filled across time and lower rows break up.",
     chart: (
       <Frame y="residue">
         {Array.from({ length: 5 }).map((_, r) =>
           Array.from({ length: 22 }).map((_, c) => {
-            const h = Math.sin(r * 12.9898 + c * 78.233) * 43758.5453;
-            const rnd = h - Math.floor(h);
             const keep = r < 2 ? 0.92 : r < 4 ? 0.75 - c * 0.03 : 0.25;
-            return rnd < keep ? <rect key={`${r}-${c}`} x={c * 10} y={3 + r * 13.5} width="9" height="11" rx="1" fill={r < 2 ? NAVY : "rgba(30,91,168,0.35)"} /> : null;
+            return hash(r, c) < keep ? (
+              <rect key={`${r}-${c}`} x={c * 10} y={3 + r * 13.5} width="9" height="11" rx="1" fill={r < 2 ? NAVY : "rgba(30,91,168,0.35)"} />
+            ) : null;
           })
         )}
       </Frame>
     ),
   },
-  {
-    title: "MM-PBSA / MM-GBSA",
-    what: "Per-residue energy contribution (comparative)",
-    alt: "Bars mostly below zero for a few residues, showing favourable contributions, and one small positive bar.",
+  pca: {
+    alt: "Scatter of frames on the first two principal components forming two conformational clusters joined by a transition path.",
+    chart: (
+      <Frame x="PC1" y="PC2">
+        <path d="M62 46 C92 50 120 20 160 24" fill="none" stroke={GOLD} strokeWidth="1.4" strokeDasharray="3 3" />
+        {PCA_POINTS.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="2.2" fill={p.basin ? GOLD : NAVY} fillOpacity="0.75" />
+        ))}
+      </Frame>
+    ),
+  },
+  energy: {
+    alt: "Bars mostly below zero for a few residues, showing favourable contributions, with one small positive bar.",
     chart: (
       <Frame x="residue" y="ΔG">
         <path d={`M0 ${H * 0.35} L${W} ${H * 0.35}`} stroke="rgba(26,26,26,0.3)" strokeWidth="1" strokeDasharray="2 3" />
@@ -144,25 +158,4 @@ const CHARTS: { title: string; what: string; alt: string; chart: React.ReactNode
       </Frame>
     ),
   },
-];
-
-export default function OutputGraphs() {
-  return (
-    <div>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 -mb-px -mr-px">
-        {CHARTS.map((c) => (
-          <li key={c.title} className="border-b border-r border-black/5 bg-cream-50 p-4">
-            <figure role="img" aria-label={`${c.title}: ${c.what}. Illustrative example — ${c.alt}`}>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[0.9rem] font-medium text-ink">{c.title}</span>
-                <span className="text-[0.66rem] uppercase tracking-[0.1em] text-ink-muted">Illustrative</span>
-              </div>
-              <div className="text-[0.76rem] text-ink-soft mb-2">{c.what}</div>
-              {c.chart}
-            </figure>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+};

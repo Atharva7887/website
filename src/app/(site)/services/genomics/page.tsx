@@ -328,7 +328,8 @@ export default function WesPage() {
 
       <ServiceCTA
         service={service}
-        title={<>Have exome data <span className="italic text-gold">to analyse?</span></>}
+        title={<>Have sequencing data <span className="italic text-gold">to analyse?</span></>}
+        lede="From raw sequencing files to annotated variant results, our genomics workflows are tailored to your study and data."
         ctaHref="#request"
         ctaLabel="Request analysis"
         background="sequencingReads"

@@ -6,11 +6,10 @@ import PageHeader from "@/components/PageHeader";
 import Reveal from "@/components/Reveal";
 import ExternalVideoCard from "@/components/ExternalVideoCard";
 import ScienceFigure from "@/components/science/ScienceFigure";
-import OutputGraphs from "@/components/science/OutputGraphs";
+import AnalysisExplorer from "@/components/science/AnalysisExplorer";
 import { MEDIA, type MediaId } from "@/lib/media";
 import MotionStory from "@/components/science/MotionStory";
 import VisualPipeline from "@/components/science/VisualPipeline";
-import PersistenceComparison from "@/components/science/PersistenceComparison";
 import { GlyphTile } from "@/components/science/Glyphs";
 import MediaFigure from "@/components/science/MediaFigure";
 import {
@@ -39,7 +38,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 }
 
 const DEFAULT_LAYOUT: SectionKey[] = [
-  "intro", "flow", "workflow", "analyses", "comparison", "closingFlow",
+  "intro", "flow", "workflow", "analyses", "closingFlow",
   "io", "applications", "gettingStarted", "videos", "faq", "note",
 ];
 
@@ -232,39 +231,8 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
       if (!service.analyses?.length) return null;
       return (
         <Section key={key}>
-          <SectionHead title={service.analysesLabel ?? "What we analyse"} lede="The quantities each simulation is analysed for. Example plots are under What goes out." />
-          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {service.analyses.map((a) => (
-              <li key={a.name} className="flex items-center gap-4 rounded-2xl border border-black/[0.06] bg-cream-50/70 p-4 md:p-5">
-                {a.glyph && <GlyphTile name={a.glyph} size="sm" tone="navy" />}
-                <div className="min-w-0">
-                  <div className="font-display text-[1.08rem] leading-tight tracking-tightest text-ink">{a.name}</div>
-                  <div className="mt-0.5 text-[0.84rem] text-ink-soft">{a.meaning}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Section>
-      );
-
-    case "comparison":
-      if (!service.comparison) return null;
-      return (
-        <Section key={key} band="navy">
-          <div className="mb-10 md:mb-14 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-            <div className="lg:col-span-7">
-              <div className="text-[0.72rem] tracking-[0.18em] uppercase text-gold mb-3">Illustrative example</div>
-              <h2 className="font-display text-[clamp(1.7rem,4vw,2.8rem)] leading-[1.02] tracking-tightest">
-                {service.comparison.label}
-              </h2>
-            </div>
-            <p className="lg:col-span-5 text-cream-100/75 text-[0.95rem] leading-[1.55]">{service.comparison.lede}</p>
-          </div>
-          <PersistenceComparison />
-          <p className="mt-6 text-[0.78rem] leading-[1.5] text-cream-100/60 max-w-[70ch]">
-            Schematic profiles generated for illustration — not results from any project or client system. A profile
-            is one input to the next decision, not a verdict on binding.
-          </p>
+          <SectionHead title={service.analysesLabel ?? "What we analyse"} />
+          <AnalysisExplorer items={service.analyses} />
         </Section>
       );
 
@@ -284,22 +252,23 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
       if (!service.deliverables?.length) return null;
       return (
         <Section key={key} band="tint">
-          <InputsOutputs
-            inputs={service.inputs}
-            process={service.ioProcess}
-            outputs={service.deliverables}
-            inputsNote={service.inputsNote}
-            outputsExtra={
-              service.ioGraphs ? (
-                <>
-                  <OutputGraphs />
-                  <p className="px-4 py-2.5 text-[0.72rem] text-ink-muted border-t border-black/5">
-                    Illustrative output formats — generated for display, not results from any project.
-                  </p>
-                </>
-              ) : undefined
-            }
-          />
+          <InputsOutputs inputs={service.inputs} process={service.ioProcess} outputs={service.deliverables} inputsNote={service.inputsNote} />
+        </Section>
+      );
+
+    case "deliverables":
+      if (!service.deliverables?.length) return null;
+      return (
+        <Section key={key} band="tint">
+          <SectionHead title="Deliverables" />
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {service.deliverables.map((d) => (
+              <li key={d.title} className="flex flex-col gap-3 rounded-2xl border border-black/[0.06] bg-cream-50 p-5">
+                <GlyphTile name={d.glyph} tone="navy" />
+                <span className="text-[0.9rem] leading-[1.35] text-ink">{d.title}</span>
+              </li>
+            ))}
+          </ul>
         </Section>
       );
 
@@ -408,7 +377,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
 
       {layout.map((key) => renderSection(key, service))}
 
-      <ServiceCTA service={service} title={<>Have a target <span className="italic text-gold">in mind?</span></>} lede="Tell us what you're working on and we'll scope the right analysis." />
+      <ServiceCTA service={service} title={service.ctaTitle ?? "Have a project in mind?"} lede={service.ctaDescription} />
 
       <Reveal />
     </main>
