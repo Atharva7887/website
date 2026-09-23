@@ -1118,23 +1118,6 @@ export function CopyNumber() {
   );
 }
 
-/** Two genes joined at a breakpoint into a fusion. */
-export function GeneFusion() {
-  return (
-    <Svg>
-      <rect x="22" y="34" width="70" height="20" rx="5" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1.3" />
-      <text x="57" y="48" textAnchor="middle" fontSize="11" fontFamily="var(--font-inter), sans-serif" fill={INK}>Gene A</text>
-      <rect x="22" y="106" width="70" height="20" rx="5" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.3" />
-      <text x="57" y="120" textAnchor="middle" fontSize="11" fontFamily="var(--font-inter), sans-serif" fill={INK}>Gene B</text>
-      <path d="M92 44 C120 44 116 80 138 80 M92 116 C120 116 116 80 138 80" stroke={INK_LINE} strokeWidth="1.5" {...S} />
-      <rect x="138" y="68" width="42" height="24" rx="5" fill={NAVY_FILL_2} stroke={NAVY} strokeWidth="1.3" />
-      <rect x="180" y="68" width="42" height="24" rx="5" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.3" />
-      <path d="M180 62 L180 98" stroke={INK} strokeWidth="1.6" strokeDasharray="2 2" {...S} />
-      <text x="180" y="112" textAnchor="middle" fontSize="8.5" letterSpacing="1" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">BREAKPOINT</text>
-    </Svg>
-  );
-}
-
 /** Screening: many panel regions, a few hotspot positions checked. */
 export function HotspotScreening() {
   return (
@@ -1197,29 +1180,6 @@ export function TumourNormal() {
   );
 }
 
-/** Variant allele fraction across timepoints: persisting, clearing, emerging. */
-export function VariantTrajectory() {
-  const xs = [48, 120, 192];
-  return (
-    <Svg>
-      <path d="M30 20 L30 128 L214 128" stroke={INK_LINE} strokeWidth="1.2" {...S} />
-      {xs.map((x, i) => (
-        <g key={x}>
-          <path d={`M${x} 124 L${x} 132`} stroke={INK_LINE} strokeWidth="1.2" {...S} />
-          <text x={x} y="146" textAnchor="middle" fontSize="10" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">T{i + 1}</text>
-        </g>
-      ))}
-      <path d="M48 48 L120 52 L192 50" stroke={NAVY} strokeWidth="2.2" {...S} />
-      <path d="M48 70 L120 100 L192 120" stroke="rgba(26,26,26,0.35)" strokeWidth="2" strokeDasharray="4 3" {...S} />
-      <path d="M48 124 L120 96 L192 40" stroke={GOLD} strokeWidth="2.4" {...S} />
-      {[[192, 50, NAVY], [192, 120, "rgba(26,26,26,0.35)"], [192, 40, GOLD]].map(([x, y, c]) => (
-        <circle key={`${y}`} cx={x as number} cy={y as number} r="4.5" fill={c as string} stroke={INK} strokeWidth="0.8" />
-      ))}
-      <text x="40" y="16" fontSize="8.5" letterSpacing="1" fontFamily="var(--font-inter), sans-serif" fill="#6B6B6B">VAF</text>
-    </Svg>
-  );
-}
-
 /* ───────────────────────────────── Registry ───────────────────────────── */
 
 export const ILLUSTRATIONS = {
@@ -1267,11 +1227,9 @@ export const ILLUSTRATIONS = {
   snvChange: SnvChange,
   indelChange: IndelChange,
   copyNumber: CopyNumber,
-  geneFusion: GeneFusion,
   hotspotScreening: HotspotScreening,
   tumourOnly: TumourOnly,
   tumourNormal: TumourNormal,
-  variantTrajectory: VariantTrajectory,
   coverageTrack: CoverageTrack,
 } as const;
 

@@ -35,7 +35,6 @@ const VARIANT_TYPES: { title: string; body: string; art: IllustrationName }[] = 
   { title: "SNVs", body: "Single-nucleotide changes identified within the covered genomic regions.", art: "snvChange" },
   { title: "Indels", body: "Insertions or deletions detected in covered regions.", art: "indelChange" },
   { title: "Copy number changes", body: "Changes in copy number inferred from sequencing coverage, where supported.", art: "copyNumber" },
-  { title: "Gene fusions / rearrangements", body: "Rearrangements or fusion events, where the panel design supports detection.", art: "geneFusion" },
 ];
 
 const SUPPORTS = ["Different targeted panel designs", "Commercial or custom panels", "Standard NGS-generated data", "Solid tumour applications", "Haematological applications"];
@@ -70,33 +69,25 @@ const ANALYSES: { name: string; body: string; art: IllustrationName; chain: stri
     art: "tumourNormal",
     chain: ["Tumour + normal", "Comparison", "Somatic / germline interpretation"],
   },
-  {
-    name: "Serial Timepoint Analysis",
-    body: "Data from two or more timepoints for the same patient, compared to show which variants persist, clear or emerge over time.",
-    art: "variantTrajectory",
-    chain: ["Timepoint 1", "Timepoint 2", "Timepoint 3", "Variant trajectory"],
-    note: "Supports treatment-response research, resistance monitoring and longitudinal profiling.",
-  },
 ];
 
 const COVERS: { title: string; body: string; glyph: GlyphName }[] = [
   { title: "SNVs", body: "Single nucleotide variants, with variant allele fraction for relevant calls.", glyph: "variant" },
   { title: "Indels", body: "Insertions and deletions, including complex or multi-nucleotide changes.", glyph: "sequence" },
   { title: "CNVs", body: "Copy number alterations inferred from coverage.", glyph: "range" },
-  { title: "Gene fusions / rearrangements", body: "Fusion or rearrangement analysis.", glyph: "interface" },
   { title: "TMB / MSI", body: "Tumour mutational burden and microsatellite instability estimates.", glyph: "signal" },
   { title: "Quality & coverage", body: "Coverage and quality assessment, with detection-limit information.", glyph: "qc" },
 ];
 
+const TIERS: { tier: string; label: string; tone: string }[] = [
+  { tier: "Tier I", label: "Strong clinical significance", tone: "bg-gold text-ink" },
+  { tier: "Tier II", label: "Potential clinical significance", tone: "bg-gold/40 text-ink" },
+  { tier: "Tier III", label: "Unknown clinical significance", tone: "bg-navy/15 text-ink" },
+];
 const INPUTS: IoItem[] = [
   { title: "FASTQ", glyph: "fastq" },
   { title: "BAM / CRAM", glyph: "align" },
   { title: "VCF", glyph: "variant" },
-  { title: "Panel design / target regions", glyph: "target" },
-  { title: "Reference genome build", glyph: "dna" },
-  { title: "Sequencing metadata", glyph: "table" },
-  { title: "Matched normal (optional)", glyph: "compare" },
-  { title: "Study context, no identifiers (optional)", glyph: "objective" },
 ];
 
 const OUTPUTS: IoItem[] = [
@@ -108,60 +99,6 @@ const OUTPUTS: IoItem[] = [
   { title: "Filtered VCF", glyph: "variant", detail: "For your own pipelines and records." },
 ];
 
-/** Illustrative report interface — placeholder variants, never patient data. */
-function TieredReportMock() {
-  const rows = [
-    { gene: "EGFR", v: "Variant A", tier: "Tier I", rel: "Strong evidence", tone: "bg-gold text-ink" },
-    { gene: "KRAS", v: "Variant B", tier: "Tier II", rel: "Supporting evidence", tone: "bg-gold/40 text-ink" },
-    { gene: "TP53", v: "Variant C", tier: "Tier III", rel: "Additional evidence", tone: "bg-navy/15 text-ink" },
-  ];
-  return (
-    <figure>
-      <ol aria-label="How a call becomes a report entry" className="flex flex-wrap items-center gap-1.5 border-b border-black/5 px-5 py-3 text-[0.68rem] tracking-[0.06em] uppercase text-navy">
-        {["Variant", "Annotation", "Evidence", "Tier", "Prioritisation"].map((s, i, a) => (
-          <li key={s} className="flex items-center gap-1.5">
-            <span className="rounded-full bg-navy/[0.07] px-2 py-0.5">{s}</span>
-            {i < a.length - 1 && <span aria-hidden className="text-gold-600">→</span>}
-          </li>
-        ))}
-      </ol>
-      <div className="p-5">
-        <table className="w-full text-left text-[0.8rem]">
-          <caption className="sr-only">Illustrative tiered variant report with placeholder variants</caption>
-          <thead className="text-[0.62rem] tracking-[0.1em] uppercase text-ink-muted">
-            <tr>
-              <th scope="col" className="py-2 font-medium">Gene</th>
-              <th scope="col" className="py-2 font-medium">Variant</th>
-              <th scope="col" className="py-2 font-medium hidden sm:table-cell">VAF</th>
-              <th scope="col" className="py-2 font-medium">Tier</th>
-              <th scope="col" className="py-2 font-medium hidden md:table-cell">Evidence</th>
-            </tr>
-          </thead>
-          <tbody className="text-ink">
-            {rows.map((r, i) => (
-              <tr key={r.gene} className="border-t border-black/[0.06]">
-                <th scope="row" className="py-2.5 font-medium">{r.gene}</th>
-                <td className="py-2.5 text-ink-soft">{r.v}</td>
-                <td className="py-2.5 hidden sm:table-cell">
-                  <span className="block h-1.5 w-16 rounded-full bg-black/10" aria-hidden>
-                    <span className="block h-1.5 rounded-full bg-navy" style={{ width: `${[42, 27, 14][i]}%` }} />
-                  </span>
-                  <span className="sr-only">Placeholder allele fraction</span>
-                </td>
-                <td className="py-2.5"><span className={`rounded-full px-2 py-0.5 text-[0.72rem] ${r.tone}`}>{r.tier}</span></td>
-                <td className="py-2.5 hidden md:table-cell text-ink-soft">{r.rel}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <figcaption className="border-t border-black/5 px-5 py-3 text-[0.72rem] text-ink-muted">
-        Illustrative interface with placeholder variants — not real patient data or a real result.
-      </figcaption>
-    </figure>
-  );
-}
-
 type Faq = { q: string; a: React.ReactNode; pending?: boolean };
 
 const FAQS: Faq[] = [
@@ -171,15 +108,11 @@ const FAQS: Faq[] = [
   },
   {
     q: "Can you analyse existing VCF or BAM files?",
-    a: "Yes. Existing variant or alignment files can be analysed or reanalysed, provided the reference genome build, target region information and relevant sequencing metadata are available. The scope depends on the supplied files.",
+    a: "Yes. Existing variant or alignment files can be analysed or reanalysed. The scope depends on the supplied files.",
   },
   {
     q: "What happens if no clinically relevant variant is detected?",
     a: "A negative result means that no reportable variant meeting the defined analysis and reporting criteria was identified. It does not exclude an alteration below the assay's detection limits, or one that cannot be reliably detected from the available data.",
-  },
-  {
-    q: "Can you analyse samples from multiple timepoints?",
-    a: "Yes. Data from multiple samples for the same patient can be compared to identify variants that persist, clear or emerge over time, supporting longitudinal analysis.",
   },
   {
     q: "Who owns the sequencing data and analysis results?",
@@ -277,7 +210,7 @@ export default function OncologyPage() {
       {/* Variant types, shown rather than listed. */}
       <Section band="tint">
         <SectionHead title="Variant types" lede="What a tumour panel analysis looks for — where the panel design supports it." />
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
           {VARIANT_TYPES.map((v) => (
             <li key={v.title} className="flex flex-col rounded-2xl border border-black/[0.06] bg-cream-50 p-5 md:p-6">
               <ScienceFigure name={v.art} description="" className="mb-5 h-40 bg-cream-100" />
@@ -313,11 +246,11 @@ export default function OncologyPage() {
 
       {/* Analyses we offer — each can pre-fill the request form. */}
       <Section band="tint">
-        <SectionHead title="Analyses we offer" lede="Four analysis designs, chosen by the samples and data available." />
-        <ol className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <SectionHead title="Analyses we offer" lede="Three analysis designs, chosen by the samples and data available." />
+        <ol className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {ANALYSES.map((a, i) => (
             <li key={a.name} className="flex flex-col rounded-3xl border border-black/[0.08] bg-cream-50 p-6 md:p-8">
-              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 xl:gap-7 items-start">
+              <div className="grid grid-cols-1 gap-5 items-start">
                 <ScienceFigure name={a.art} description="" className="h-44 bg-cream-100" />
                 <div>
                   <span className="kicker text-navy/70 tabular-nums">{String(i + 1).padStart(2, "0")}</span>
@@ -334,6 +267,7 @@ export default function OncologyPage() {
                 ))}
               </div>
               {a.note && <p className="mt-3 text-[0.8rem] text-ink-muted">{a.note}</p>}
+              <div className="mt-auto" />
               <SelectTestButton test={a.name} />
             </li>
           ))}
@@ -349,9 +283,9 @@ export default function OncologyPage() {
             Where supported by panel design and data quality
           </p>
         </div>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ul className="flex flex-wrap gap-4">
           {COVERS.map((c) => (
-            <li key={c.title} className="flex gap-4 rounded-2xl border border-black/[0.06] bg-cream-50/70 p-5">
+            <li key={c.title} className="flex grow basis-full sm:basis-[calc(50%-0.5rem)] lg:basis-[calc(33.333%-0.75rem)] gap-4 rounded-2xl border border-black/[0.06] bg-cream-50/70 p-5">
               <GlyphTile name={c.glyph} tone="navy" />
               <div>
                 <h3 className="font-display text-[1.12rem] leading-tight tracking-tightest text-ink">{c.title}</h3>
@@ -362,19 +296,32 @@ export default function OncologyPage() {
         </ul>
       </Section>
 
-      {/* What comes in → what goes out; "What you receive" is merged into the outputs. */}
+      {/* Tier definitions — the scale each reported variant is placed on. */}
       <Section band="tint">
-        <InputsOutputs
+        <SectionHead title="Tier definitions" lede="Each reported variant is assigned one tier." />
+        <dl className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+          {TIERS.map((t) => (
+            <div key={t.tier} className="rounded-2xl border border-black/[0.06] bg-cream-50 p-6">
+              <dt>
+                <span className={`inline-block rounded-full px-3 py-1 text-[0.8rem] font-medium ${t.tone}`}>{t.tier}</span>
+                <span className="sr-only"> — </span>
+              </dt>
+              <dd className="mt-4 font-display text-[1.25rem] leading-tight tracking-tightest text-ink">{t.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
+      {/* What comes in → what goes out. */}
+      <Section>        <InputsOutputs
           inputs={INPUTS}
           process={["Quality & processing", "Variant calling", "Annotation & tiering"]}
           outputs={OUTPUTS}
-          inputsNote="Not sure what files you have? Our team can review the available data and confirm what can be analysed."
-          outputsExtra={<TieredReportMock />}
         />
       </Section>
 
       {/* Request analysis */}
-      <Section id="request">
+      <Section id="request" band="tint">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
           <div className="lg:col-span-4">
             <div className="kicker mb-3">Get started</div>
@@ -400,7 +347,7 @@ export default function OncologyPage() {
       </Section>
 
       {/* FAQ + scope */}
-      <Section band="tint">
+      <Section>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <h2 className="lg:col-span-4 font-display text-[clamp(1.6rem,3.5vw,2.4rem)] leading-[1.05] tracking-tightest text-ink">Common questions</h2>
           <div className="lg:col-span-8">
