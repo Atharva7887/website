@@ -52,8 +52,8 @@ export type ServiceCardGroup = {
   id: string;
   label: string;
   lede?: string;
-  /** "glyph" renders an icon tile instead of a full illustration. */
-  variant?: "illustrated" | "glyph";
+  /** "glyph" renders an icon tile; "row" is a horizontal image-left card for renders. */
+  variant?: "illustrated" | "glyph" | "row";
   cards: ServiceCard[];
   /** Compact chip row under the grid for secondary capabilities. */
   chips?: { label: string; items: string[] };
@@ -354,13 +354,14 @@ export const SERVICES: ServiceEntry[] = [
         id: "types",
         label: "Docking types",
         lede: "Six system types, each with its own sampling and scoring considerations.",
+        variant: "row",
         cards: [
-          { title: "Protein–Small Molecule", body: "Pocket-directed docking with interaction breakdown.", illustration: "proteinSmallMolecule" },
-          { title: "Protein–Protein", body: "Association modes between two protein partners.", illustration: "proteinProtein" },
-          { title: "Antibody–Antigen", body: "CDR-aware docking of the paratope–epitope interface.", illustration: "antibodyAntigen" },
-          { title: "Protein–Peptide", body: "Flexible docking where backbone freedom matters.", illustration: "proteinPeptide" },
-          { title: "Protein–DNA", body: "Duplex association with groove and electrostatic contacts.", illustration: "proteinDNA" },
-          { title: "Protein–RNA", body: "Association that allows for RNA flexibility.", illustration: "proteinRNA" },
+          { title: "Protein–Small Molecule", body: "Pocket-directed docking with interaction breakdown.", media: "dockSmallMolecule" },
+          { title: "Protein–Protein", body: "Association modes and interface characterisation.", media: "dockProteinProtein" },
+          { title: "Antibody–Antigen", body: "CDR-aware docking of the paratope–epitope interface.", media: "dockAntibodyAntigen" },
+          { title: "Protein–Peptide", body: "Peptide binding modes and interactions, allowing for backbone flexibility.", media: "dockProteinPeptide" },
+          { title: "Protein–DNA", body: "DNA recognition and binding-interface analysis, including groove contacts.", media: "dockProteinDNA" },
+          { title: "Protein–RNA", body: "RNA interaction modes and interface mapping, allowing for RNA flexibility.", media: "dockProteinRNA" },
         ],
       },
     ],

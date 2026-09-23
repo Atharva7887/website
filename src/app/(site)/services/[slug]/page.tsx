@@ -42,7 +42,53 @@ const DEFAULT_LAYOUT: SectionKey[] = [
   "io", "applications", "gettingStarted", "videos", "faq", "note",
 ];
 
+/** Horizontal render card: image on a soft circle to the left, text to the right. */
+function RowCards({ group }: { group: ServiceCardGroup }) {
+  return (
+    <Section>
+      <SectionHead title={group.label} lede={group.lede} />
+      <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
+        {group.cards.map((card) => {
+          const m = card.media ? MEDIA[card.media] : undefined;
+          return (
+            <li
+              key={card.title}
+              className="group flex items-center gap-4 sm:gap-6 rounded-2xl border border-black/[0.06] bg-gradient-to-br from-cream-50 to-white/70 p-4 sm:p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-navy/20 hover:shadow-[0_18px_40px_-28px_rgba(16,53,101,0.5)]"
+            >
+              <div className="relative flex h-32 w-32 sm:h-36 sm:w-36 shrink-0 items-center justify-center">
+                <span aria-hidden className="absolute inset-2 rounded-full bg-navy/[0.06]" />
+                {m ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={m.src}
+                    alt={m.alt}
+                    width={m.width}
+                    height={m.height}
+                    loading="lazy"
+                    decoding="async"
+                    className="relative h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                ) : card.illustration ? (
+                  <ScienceFigure name={card.illustration} description="" padded={false} className="relative h-full w-full border-0 bg-transparent" />
+                ) : null}
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-display text-[1.22rem] md:text-[1.35rem] leading-[1.1] tracking-tightest text-ink transition-colors duration-500 group-hover:text-navy">
+                  {card.title}
+                </h3>
+                <p className="mt-1.5 text-ink-soft text-[0.9rem] leading-[1.5]">{card.body}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-4 text-[0.74rem] text-ink-muted">Illustrative renders of each system type.</p>
+    </Section>
+  );
+}
+
 function CardGroup({ group }: { group: ServiceCardGroup }) {
+  if (group.variant === "row") return <RowCards group={group} />;
   const glyph = group.variant === "glyph";
   const cols =
     group.cards.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4"

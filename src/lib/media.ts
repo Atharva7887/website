@@ -14,7 +14,8 @@
 
 export type MediaAsset = {
   src: string;
-  kind: "structure" | "video";
+  /** structure = rendered from real PDB coordinates; render = illustrative image. */
+  kind: "structure" | "video" | "render";
   alt: string;
   width: number;
   height: number;
@@ -103,6 +104,75 @@ export const MEDIA = {
     source: "RCSB PDB 1BRS (barnase–barstar)",
     license: "PDB data CC0; render original",
     usedOn: ["/services/molecular-docking (Binding Interface Characterization card)"],
+  },
+  /* Docking-type renders — supplied by IndiskaAI as card images; cropped and
+     background-removed by scripts/cutout-docking-types.mjs. Illustrative
+     depictions of each system type, not specific PDB structures. */
+  dockSmallMolecule: {
+    src: "/docking-types/protein-small-molecule.webp",
+    kind: "render",
+    alt: "Protein surface with a small-molecule ligand (orange) sitting inside a binding pocket",
+    width: 236,
+    height: 245,
+    credit: "Illustrative render",
+    source: "Supplied by IndiskaAI (docking-type card image)",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/molecular-docking (Docking types)"],
+  },
+  dockProteinProtein: {
+    src: "/docking-types/protein-protein.webp",
+    kind: "render",
+    alt: "Two protein partners (blue and green) with their shared interface highlighted in orange",
+    width: 254,
+    height: 225,
+    credit: "Illustrative render",
+    source: "Supplied by IndiskaAI (docking-type card image)",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/molecular-docking (Docking types)"],
+  },
+  dockAntibodyAntigen: {
+    src: "/docking-types/antibody-antigen.webp",
+    kind: "render",
+    alt: "Antibody with heavy and light chains in blue shades and an antigen (magenta) engaging the Fab tip, interface in orange",
+    width: 264,
+    height: 265,
+    credit: "Illustrative render",
+    source: "Supplied by IndiskaAI (docking-type card image)",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/molecular-docking (Docking types)"],
+  },
+  dockProteinPeptide: {
+    src: "/docking-types/protein-peptide.webp",
+    kind: "render",
+    alt: "Protein surface with a helical peptide (orange) bound across it",
+    width: 234,
+    height: 255,
+    credit: "Illustrative render",
+    source: "Supplied by IndiskaAI (docking-type card image)",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/molecular-docking (Docking types)"],
+  },
+  dockProteinDNA: {
+    src: "/docking-types/protein-dna.webp",
+    kind: "render",
+    alt: "Protein surface (lavender) alongside a DNA double helix",
+    width: 239,
+    height: 262,
+    credit: "Illustrative render",
+    source: "Supplied by IndiskaAI (docking-type card image)",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/molecular-docking (Docking types)"],
+  },
+  dockProteinRNA: {
+    src: "/docking-types/protein-rna.webp",
+    kind: "render",
+    alt: "Protein surface (green) with an RNA helix (orange) bound along it",
+    width: 219,
+    height: 243,
+    credit: "Illustrative render",
+    source: "Supplied by IndiskaAI (docking-type card image)",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/molecular-docking (Docking types)"],
   },
 } as const satisfies Record<string, MediaAsset>;
 

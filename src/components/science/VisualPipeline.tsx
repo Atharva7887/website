@@ -77,8 +77,10 @@ export default function VisualPipeline({
               </div>
             ) : null}
 
-            <div className={`relative z-10 ${Art ? "lg:hidden" : ""}`}>
-              <div className="relative">
+            {/* w-fit: in the desktop column layout this wrapper would otherwise
+                stretch to the full column, pinning the badge to the column's edge. */}
+            <div className={`relative z-10 w-fit shrink-0 self-start ${Art ? "lg:hidden" : ""}`}>
+              <div className="relative w-fit">
                 <GlyphTile name={step.glyph ?? "target"} tone={dark ? "cream" : "navy"} />
                 <span className={`absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[0.6rem] font-medium tabular-nums ${dark ? "bg-gold text-ink" : "bg-ink text-cream-100"}`}>
                   {String(i + 1).padStart(2, "0")}

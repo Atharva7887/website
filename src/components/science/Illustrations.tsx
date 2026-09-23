@@ -135,88 +135,6 @@ export function AntibodyAntigen() {
   );
 }
 
-export function ProteinPeptide() {
-  return (
-    <Svg>
-      <path
-        d="M36 34 C24 60 24 104 38 130 C62 150 178 150 202 130 C216 104 216 60 204 34 C178 16 62 16 36 34 Z"
-        fill={NAVY_FILL}
-        stroke={NAVY}
-        strokeWidth="1.6"
-        {...S}
-      />
-      <path
-        d="M58 82 C58 68 74 62 92 62 L148 62 C166 62 182 68 182 82 C182 96 166 102 148 102 L92 102 C74 102 58 96 58 82 Z"
-        fill="rgba(250,247,240,0.75)"
-        stroke={INK_LINE}
-        strokeWidth="1.2"
-        {...S}
-      />
-      {[78, 100, 122, 144, 166].map((cx, i) => (
-        <circle key={cx} cx={cx} cy="82" r="8" fill={i === 2 ? GOLD : GOLD_FILL} stroke={GOLD} strokeWidth="1.5" />
-      ))}
-      <path d="M86 82 L92 82 M108 82 L114 82 M130 82 L136 82 M152 82 L158 82" stroke={GOLD} strokeWidth="1.6" {...S} />
-    </Svg>
-  );
-}
-
-/** Duplex drawn as two mirrored waves — they cross where a real duplex crosses. */
-function Duplex({ accent = false }: { accent?: boolean }) {
-  return (
-    <g>
-      <path d="M18 100 Q40.5 55 63 100 T108 100 T153 100 T198 100" stroke={NAVY} strokeWidth="2.2" {...S} />
-      <path d="M18 100 Q40.5 145 63 100 T108 100 T153 100 T198 100" stroke={NAVY} strokeWidth="2.2" {...S} />
-      {[40.5, 85.5, 130.5, 175.5].map((x, i) => (
-        <path
-          key={x}
-          d={`M${x} 77.5 L${x} 122.5`}
-          stroke={accent && i === 2 ? GOLD : INK_LINE}
-          strokeWidth={accent && i === 2 ? 2.4 : 1.6}
-          {...S}
-        />
-      ))}
-    </g>
-  );
-}
-
-export function ProteinDNA() {
-  return (
-    <Svg>
-      <Duplex accent />
-      <path
-        d="M112 62 C96 56 96 30 118 24 C142 17 166 26 168 46 C170 62 150 70 132 66 Z"
-        fill={NAVY_FILL_2}
-        stroke={NAVY}
-        strokeWidth="1.6"
-        {...S}
-      />
-      <path d="M128 68 L130 78" stroke={GOLD} strokeWidth="1.6" strokeDasharray="2 3" {...S} />
-    </Svg>
-  );
-}
-
-export function ProteinRNA() {
-  return (
-    <Svg>
-      <path d="M26 138 C56 138 66 120 66 104 L66 72" stroke={NAVY} strokeWidth="2.2" {...S} />
-      <path d="M92 138 C92 120 92 104 92 72" stroke={NAVY} strokeWidth="2.2" {...S} />
-      <path d="M66 72 C66 44 92 44 92 72" stroke={NAVY} strokeWidth="2.2" {...S} />
-      {[126, 112, 98, 84].map((y) => (
-        <path key={y} d={`M68 ${y} L90 ${y}`} stroke={INK_LINE} strokeWidth="1.5" {...S} />
-      ))}
-      <path
-        d="M118 56 C106 40 122 20 146 22 C176 24 194 44 188 66 C182 88 146 92 130 76 Z"
-        fill={NAVY_FILL_2}
-        stroke={NAVY}
-        strokeWidth="1.6"
-        {...S}
-      />
-      <path d="M96 58 L120 54 M96 70 L118 68" stroke={GOLD} strokeWidth="1.5" strokeDasharray="2 3" {...S} />
-      <circle cx="79" cy="52" r="7" fill={GOLD_FILL} stroke={GOLD} strokeWidth="1.5" />
-    </Svg>
-  );
-}
-
 /* ───────────────────────────── Concept figures ────────────────────────── */
 
 /** Residue letters folding into a helix — the sequence→structure step. */
@@ -1308,9 +1226,6 @@ export const ILLUSTRATIONS = {
   proteinSmallMolecule: ProteinSmallMolecule,
   proteinProtein: ProteinProtein,
   antibodyAntigen: AntibodyAntigen,
-  proteinPeptide: ProteinPeptide,
-  proteinDNA: ProteinDNA,
-  proteinRNA: ProteinRNA,
   sequenceToStructure: SequenceToStructure,
   dockingPoses: DockingPoses,
   trajectoryMotion: TrajectoryMotion,
