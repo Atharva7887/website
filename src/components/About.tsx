@@ -2,8 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useRef } from "react";
-import ScienceFigure from "@/components/science/ScienceFigure";
-import { GlyphTile } from "@/components/science/Glyphs";
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -28,52 +26,64 @@ export default function About() {
               <span className="italic text-navy">and</span> the bits.
             </h2>
 
-            {/* "The bench and the bits", drawn: molecular engineering beside computation. */}
-            <div className="mt-10 grid grid-cols-2 gap-3">
-              {[
-                { name: "libraryDiversity" as const, label: "Molecular engineering", d: "Antibody library diversity distribution" },
-                { name: "sequenceToStructure" as const, label: "Computation", d: "A sequence resolving into a predicted structure" },
-              ].map((f) => (
-                <figure key={f.label}>
-                  <ScienceFigure name={f.name} description={f.d} className="aspect-[4/3]" />
-                  <figcaption className="mt-2 text-[0.66rem] tracking-[0.12em] uppercase text-ink-muted">{f.label}</figcaption>
-                </figure>
-              ))}
+            {/* Structural biology lab — grounds the "bench" half of the claim */}
+            <div className="mt-10 relative aspect-[4/3] overflow-hidden rounded-2xl border border-black/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1630959305790-4c956ce6c0b6?auto=format&fit=crop&q=80&w=1200"
+                alt="Scientist examining a sample under a microscope in a structural biology laboratory"
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(26,26,26,0) 55%, rgba(26,26,26,0.32) 100%)",
+                }}
+              />
             </div>
           </motion.div>
 
-          <div className="lg:col-span-7">
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display text-ink text-[1.35rem] md:text-[1.7rem] leading-[1.3] tracking-tight max-w-[34ch]"
-            >
-              IndiskaAI builds antibody libraries and intelligent discovery
-              platforms for biopharma and biotechnology partners.
-            </motion.p>
-
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                { glyph: "search" as const, title: "The problem", body: "Screening millions of candidates with limited precision is slow and costly." },
-                { glyph: "structure" as const, title: "Our approach", body: "Molecular engineering and sequencing, with AI models layered on top." },
-                { glyph: "validate" as const, title: "Quality throughout", body: "Checks across library construction, screening, and analysis." },
-              ].map((c, i) => (
-                <motion.div
-                  key={c.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: 0.08 + i * 0.08 }}
-                  className="rounded-2xl border border-black/[0.06] bg-cream-50/70 p-5"
-                >
-                  <GlyphTile name={c.glyph} tone="navy" />
-                  <h3 className="mt-4 font-display text-[1.15rem] leading-tight tracking-tightest text-ink">{c.title}</h3>
-                  <p className="mt-1.5 text-ink-soft text-[0.88rem] leading-[1.5]">{c.body}</p>
-                </motion.div>
-              ))}
-            </div>
+          <div className="lg:col-span-7 space-y-6 text-ink-soft text-[1.06rem] md:text-[1.12rem] leading-[1.65]">
+            {[
+              <p key="p1">
+                IndiskaAI is a biotechnology company advancing antibody
+                engineering, discovery, and next-generation therapeutic
+                research. We build high-quality antibody libraries and
+                intelligent discovery platforms for biopharma and
+                biotechnology partners.
+              </p>,
+              <p key="p2">
+                Discovering effective antibodies is slow and costly: traditional
+                methods mean screening <em>millions</em> of candidates with
+                limited precision, and predicting stability, safety, and
+                manufacturability early in development remains difficult. We
+                built IndiskaAI to close that gap.
+              </p>,
+              <p key="p3">
+                Our approach combines advanced molecular engineering,
+                data-driven analysis, and modern sequencing technology, with
+                AI models and computational tools layered on top, to support
+                quality control throughout library construction, screening,
+                and validation.
+              </p>,
+            ].map((el, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{
+                  duration: 0.85,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: i * 0.08,
+                }}
+              >
+                {el}
+              </motion.div>
+            ))}
           </div>
         </div>
 

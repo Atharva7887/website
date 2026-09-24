@@ -19,11 +19,11 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL("https://indiskaai.com"),
   title: {
-    default: "IndiskaAI - AI-Assisted Computational Biology",
+    default: "IndiskaAI - AI-Accelerated Antibody Discovery",
     template: "%s - IndiskaAI",
   },
   description:
-    "IndiskaAI builds antibody libraries and AI-assisted discovery platforms, helping biopharma and biotechnology partners identify and prioritise promising antibody candidates.",
+    "IndiskaAI builds antibody libraries and AI-driven discovery platforms, helping biopharma and biotechnology partners identify promising antibody candidates with greater speed and precision.",
   icons: { icon: "/favicon.ico" },
   openGraph: {
     title: "IndiskaAI",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "IndiskaAI",
     description:
-      "AI-assisted antibody discovery and computational biology.",
+      "AI-accelerated antibody discovery and engineering.",
   },
 };
 
