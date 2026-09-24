@@ -12,6 +12,9 @@ import MotionStory from "@/components/science/MotionStory";
 import VisualPipeline from "@/components/science/VisualPipeline";
 import { GlyphTile } from "@/components/science/Glyphs";
 import MediaFigure from "@/components/science/MediaFigure";
+import MdVisual from "@/components/md/MdVisual";
+import DockVisual from "@/components/docking/DockVisual";
+import CandidateComparison from "@/components/docking/CandidateComparison";
 import {
   SERVICES,
   SERVICE_GROUPS,
@@ -87,8 +90,92 @@ function RowCards({ group }: { group: ServiceCardGroup }) {
   );
 }
 
+/** Visual-first product card: the animated MD scene is the content, text sits beneath. */
+function SceneCards({ group }: { group: ServiceCardGroup }) {
+  return (
+    <Section>
+      <SectionHead title={group.label} lede={group.lede} />
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+        {group.cards.map((card, i) => (
+          <li
+            key={card.title}
+            className="group flex flex-col overflow-hidden rounded-2xl border border-black/[0.07] bg-cream-50 transition-all duration-500 hover:-translate-y-1 hover:border-navy/25 hover:shadow-[0_24px_48px_-30px_rgba(16,53,101,0.55)]"
+          >
+            {card.scene && <MdVisual scene={card.scene} t0={i * 1.7} className="h-56 md:h-60 border-b border-black/[0.06]" />}
+            <div className="flex flex-1 flex-col p-5 md:p-6">
+              <h3 className="font-display text-[1.25rem] md:text-[1.35rem] leading-[1.1] tracking-tightest text-ink transition-colors duration-500 group-hover:text-navy">
+                {card.title}
+              </h3>
+              <p className="mt-1.5 text-ink-soft text-[0.9rem] leading-[1.5]">{card.body}</p>
+              <Link href="/partner" className="mt-auto inline-flex items-center gap-1.5 pt-4 text-[0.86rem] font-medium text-navy">
+                Enquire
+                <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                <span className="sr-only"> about {card.title} simulations</span>
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-[0.74rem] text-ink-muted">Illustrative MD simulations of each system type, not outputs from an actual run.</p>
+    </Section>
+  );
+}
+
+/**
+ * Docking "What we analyse": a large animated visual, then title, evidence
+ * caption and one-line description. Cards are focusable, so hover, keyboard
+ * focus and tap all bring the visual forward and its labels to full strength.
+ */
+function FeatureCards({ group }: { group: ServiceCardGroup }) {
+  return (
+    <Section>
+      <SectionHead title={group.label} lede={group.lede} />
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+        {group.cards.map((card) => (
+          <li key={card.title}>
+            <article
+              tabIndex={0}
+              aria-label={card.title}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-black/[0.07] bg-cream-50 outline-none transition-all duration-500 hover:-translate-y-1 hover:border-navy/25 hover:shadow-[0_28px_56px_-34px_rgba(16,53,101,0.55)] focus-visible:border-navy/40 focus-visible:ring-2 focus-visible:ring-gold/60"
+            >
+              <div className="overflow-hidden border-b border-black/[0.06]">
+                <div className="transition-transform duration-700 ease-out group-hover:scale-[1.025] group-focus:scale-[1.025]">
+                  {card.dock === "compare" ? (
+                    <CandidateComparison className="aspect-[4/3] md:aspect-[16/11] w-full" />
+                  ) : card.dock ? (
+                    <DockVisual scene={card.dock} className="aspect-[4/3] md:aspect-[16/11] w-full" />
+                  ) : null}
+                </div>
+              </div>
+              <div className="p-5 md:p-6">
+                <h3 className="font-display text-[1.3rem] md:text-[1.45rem] leading-[1.1] tracking-tightest text-ink transition-colors duration-500 group-hover:text-navy group-focus:text-navy">
+                  {card.title}
+                </h3>
+                {card.caption && <p className="mt-1.5 text-[0.74rem] tracking-[0.02em] text-ink-muted">{card.caption}</p>}
+                <p className="mt-3 text-ink-soft text-[0.92rem] leading-[1.55]">{card.body}</p>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ul>
+      {group.chips && (
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <span className="kicker mr-2">{group.chips.label}</span>
+          {group.chips.items.map((c) => (
+            <span key={c} className="rounded-full border border-navy/15 bg-navy/[0.04] px-3.5 py-1.5 text-[0.82rem] text-ink">
+              {c}
+            </span>
+          ))}
+        </div>
+      )}
+    </Section>
+  );
+}
+
 function CardGroup({ group }: { group: ServiceCardGroup }) {
   if (group.variant === "row") return <RowCards group={group} />;
+  if (group.variant === "scene") return <SceneCards group={group} />;
+  if (group.variant === "feature") return <FeatureCards group={group} />;
   const glyph = group.variant === "glyph";
   const cols =
     group.cards.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4"
@@ -109,8 +196,11 @@ function CardGroup({ group }: { group: ServiceCardGroup }) {
                 <GlyphTile name={card.glyph} tone="navy" />
               </div>
             )}
-            {!glyph && card.media && <CardMedia id={card.media} />}
-            {!glyph && !card.media && card.illustration && (
+            {!glyph && card.scene && (
+              <MdVisual scene={card.scene} t0={5} compact className="mb-5 h-40 md:h-44 rounded-2xl border border-black/5" />
+            )}
+            {!glyph && !card.scene && card.media && <CardMedia id={card.media} />}
+            {!glyph && !card.scene && !card.media && card.illustration && (
               <ScienceFigure name={card.illustration} description="" className="mb-5 h-40 md:h-44 bg-cream-100" />
             )}
             {card.path && (
@@ -133,6 +223,11 @@ function CardGroup({ group }: { group: ServiceCardGroup }) {
           </article>
         ))}
       </div>
+      {group.cards.some((c) => c.scene) ? (
+        <p className="mt-4 text-[0.74rem] text-ink-muted">Animated visuals are illustrative MD simulations, not outputs from an actual run.</p>
+      ) : group.cards.some((c) => c.media && MEDIA[c.media].kind === "render") ? (
+        <p className="mt-4 text-[0.74rem] text-ink-muted">Illustrative renders, not outputs from an actual run.</p>
+      ) : null}
       {group.chips && (
         <div className="mt-6 flex flex-wrap items-center gap-2">
           <span className="kicker mr-2">{group.chips.label}</span>
@@ -219,7 +314,12 @@ function renderSection(key: SectionKey, service: ServiceEntry): React.ReactNode 
                   </h2>
                   <p className="mt-4 text-ink-soft text-[1rem] leading-[1.6] max-w-[44ch]">{r.body}</p>
                 </div>
-                {r.media ? (
+                {r.scene ? (
+                  <figure className={`lg:col-span-7 ${i % 2 ? "lg:order-1" : ""}`}>
+                    <MdVisual scene={r.scene} t0={8} className="aspect-[16/11] w-full rounded-2xl border border-black/[0.07] shadow-[0_24px_60px_-44px_rgba(16,53,101,0.5)]" />
+                    {r.artCaption && <figcaption className="mt-2.5 text-[0.72rem] leading-[1.45] text-ink-muted">{r.artCaption}</figcaption>}
+                  </figure>
+                ) : r.media ? (
                   <MediaFigure id={r.media} className={`lg:col-span-7 ${i % 2 ? "lg:order-1" : ""}`} frameClassName="max-h-[460px]" />
                 ) : r.art ? (
                   <figure className={`lg:col-span-7 ${i % 2 ? "lg:order-1" : ""}`}>
@@ -411,7 +511,12 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
           </>
         }
         aside={
-          service.heroMedia ? (
+          service.heroScene ? (
+            <figure>
+              <MdVisual scene={service.heroScene} className="aspect-[4/3] w-full rounded-3xl border border-black/[0.07] bg-[radial-gradient(ellipse_at_50%_42%,#FFFFFF_0%,#EEF1F4_55%,#FAF7F0_100%)] shadow-[0_30px_70px_-50px_rgba(16,53,101,0.55)]" />
+              <figcaption className="mt-2.5 text-[0.72rem] text-ink-muted">Illustrative molecular dynamics visualization · drag to turn</figcaption>
+            </figure>
+          ) : service.heroMedia ? (
             <MediaFigure id={service.heroMedia} priority frameClassName="max-h-[420px]" />
           ) : service.story ? (
             <MotionStory label={service.story.label} frames={service.story.frames} description={service.story.description} />

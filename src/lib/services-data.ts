@@ -3,7 +3,9 @@ import type { GlyphName } from "@/components/science/Glyphs";
 import type { StoryFrame } from "@/components/science/MotionStory";
 import type { ExternalVideo } from "@/components/ExternalVideoCard";
 import type { MediaId } from "@/lib/media";
-import type { MdChartKey } from "@/components/science/MdCharts";
+import type { MdPlotKey } from "@/components/md/MdPlots";
+import type { MdSceneKey } from "@/components/md/scenes";
+import type { DockSceneKey } from "@/components/docking/dockScenes";
 
 /**
  * IndiskaAI's service lines. Shared by the Nav "Services" dropdown, the
@@ -43,6 +45,12 @@ export type ServiceCard = {
   illustration?: IllustrationName;
   /** A real-data render instead of a schematic — see src/lib/media.ts. */
   media?: MediaId;
+  /** An animated, illustrative MD scene (components/md) in place of a still figure. */
+  scene?: MdSceneKey;
+  /** A docking visual (components/docking): a real-structure scene, or the illustrative comparison. */
+  dock?: DockSceneKey | "compare";
+  /** Short evidence line under the title, e.g. "Real structure · PDB 1HSG". */
+  caption?: string;
   glyph?: GlyphName;
   /** Tiny visual chain under the figure, e.g. ["Reads", "Lineages", "Candidates"]. */
   path?: string[];
@@ -52,15 +60,15 @@ export type ServiceCardGroup = {
   id: string;
   label: string;
   lede?: string;
-  /** "glyph" renders an icon tile; "row" is a horizontal image-left card for renders. */
-  variant?: "illustrated" | "glyph" | "row";
+  /** "glyph" renders an icon tile; "row" is a horizontal image-left card for renders; "scene" is a visual-first product card around an animated MD scene; "feature" is a 2×2 grid of large docking visuals. */
+  variant?: "illustrated" | "glyph" | "row" | "scene" | "feature";
   cards: ServiceCard[];
   /** Compact chip row under the grid for secondary capabilities. */
   chips?: { label: string; items: string[] };
 };
 
-/** An analysis concept — deliberately no chart; plots live in "What goes out". */
-export type ServiceAnalysis = { name: string; meaning: string; detail?: string; chart?: MdChartKey };
+/** An analysis concept; `chart` opens an animated illustrative plot when the item is explored. */
+export type ServiceAnalysis = { name: string; meaning: string; detail?: string; chart?: MdPlotKey };
 export type ServiceItem = { title: string; glyph: GlyphName };
 
 /**
@@ -101,8 +109,10 @@ export type ServiceEntry = {
   story?: { label: string; description: string; frames: StoryFrame[] };
   /** A real-data visual (PDB render / project video) for the hero. */
   heroMedia?: MediaId;
+  /** An animated 3D MD scene for the hero (components/md); takes precedence over `story`. */
+  heroScene?: MdSceneKey;
   /** Real-structure rows, rendered image-beside-text and alternating sides. */
-  realImages?: { media?: MediaId; art?: IllustrationName; artCaption?: string; kicker: string; title: string; body: string }[];
+  realImages?: { media?: MediaId; scene?: MdSceneKey; art?: IllustrationName; artCaption?: string; kicker: string; title: string; body: string }[];
   /** Page has its own route under app/(site)/services; excluded from [slug]. */
   custom?: boolean;
   significance?: string;
@@ -216,10 +226,10 @@ export const SERVICES: ServiceEntry[] = [
         lede: "Pick the card that looks like what you have today.",
         cards: [
           { title: "Single Lead", subtitle: "One sequence", body: "One sequence seeds variant generation and ranking.", illustration: "singleLead", path: ["Sequence", "Variants", "Lead"] },
-          { title: "Lead Optimization Data", subtitle: "Prior campaign data", body: "Existing variant or enrichment data informs the next designs.", illustration: "leadOptimization", path: ["Parent", "Variants", "Optimised"] },
-          { title: "NGS Data", subtitle: "Sequencing datasets", body: "Repertoire or panning output is clustered and mined for lineages.", illustration: "sequencingReads", path: ["Reads", "Diversity", "Candidates"] },
-          { title: "De Novo", subtitle: "No starting antibody", body: "Binders are generated computationally against a specified epitope.", illustration: "deNovoDesign", path: ["Target", "Generation", "Candidates"] },
-          { title: "Epitope Identification", subtitle: "Epitope-focused", body: "The antigen surface is mapped first, then design is aimed at it.", illustration: "epitopeMap", path: ["Surface", "Regions", "Epitope"] },
+          { title: "Lead Optimization Data", subtitle: "Prior campaign data", body: "Existing variant or enrichment data informs the next designs.", media: "leadOptimizationScene", path: ["Parent", "Variants", "Optimised"] },
+          { title: "NGS Data", subtitle: "Sequencing datasets", body: "Repertoire or panning output is clustered and mined for lineages.", media: "ngsDataScene", path: ["Reads", "Diversity", "Candidates"] },
+          { title: "De Novo", subtitle: "No starting antibody", body: "Binders are generated computationally against a specified epitope.", media: "deNovoScene", path: ["Target", "Generation", "Candidates"] },
+          { title: "Epitope Identification", subtitle: "Epitope-focused", body: "The antigen surface is mapped first, then design is aimed at it.", media: "epitopeIdScene", path: ["Surface", "Regions", "Epitope"] },
         ],
       },
     ],
@@ -339,11 +349,12 @@ export const SERVICES: ServiceEntry[] = [
       {
         id: "analyse",
         label: "What we analyse",
+        variant: "feature",
         cards: [
-          { title: "Binding-Pose Prediction", body: "Explore plausible orientations of interacting molecules within a predicted complex.", illustration: "dockingPoses" },
-          { title: "Binding Interface Characterization", body: "Identify potential binding pockets, surface patches, and interface regions.", media: "barnaseBarstar" },
-          { title: "Residue-Level Interaction Mapping", body: "Map interface residues and characterise predicted molecular contacts.", media: "fabLysozyme" },
-          { title: "Comparative Candidate Analysis", body: "Compare predicted poses, interfaces, and interaction patterns across candidates.", illustration: "candidateCompare" },
+          { title: "Binding-Pose Prediction", caption: "Real structure · PDB 1HSG", body: "Predict how a ligand orients and settles within a protein's binding pocket, ranking plausible poses by score and key contacts.", dock: "pose" },
+          { title: "Binding Interface Characterization", caption: "Real structure · PDB 1BRS", body: "Identify where two proteins meet, mapping interface residues within 4.5 Å and the hydrogen bonds and salt bridges that hold the complex together.", dock: "interface" },
+          { title: "Residue-Level Interaction Mapping", caption: "Real structure · PDB 3HFM", body: "Resolve the interface pair by pair, from each contacting residue to its partner, contact type and distance in ångströms.", dock: "residues" },
+          { title: "Comparative Candidate Analysis", caption: "Illustrative data", body: "Compare docking outcomes for the parent, benchmark and AI-assisted candidates side by side to see which variants perform best.", dock: "compare" },
         ],
         chips: {
           label: "Also available",
@@ -421,17 +432,7 @@ export const SERVICES: ServiceEntry[] = [
     summary: "From static poses to dynamic behaviour.",
     description:
       "Simulation of stability and interaction persistence over time. A docked pose is a single frame; a trajectory shows whether it holds together.",
-    story: {
-      label: "Static complex to analysis",
-      description: "A static complex set in motion, frames fluctuating, persistent contacts separated from transient ones, and the results analysed",
-      frames: [
-        { art: "proteinSmallMolecule", title: "Static complex", caption: "A docked pose: one frame, no time." },
-        { art: "trajectoryMotion", title: "MD trajectory", caption: "The solvated system evolves under a force field." },
-        { art: "structuralFluctuation", title: "Structural fluctuation", caption: "Frames overlay; loops and termini move most." },
-        { art: "contactPersistence", title: "Interaction persistence", caption: "Some contacts hold across the run; others fade early." },
-        { art: "trajectoryAnalysis", title: "Analysis", caption: "Deviation, flexibility, and contacts are quantified." },
-      ],
-    },
+    heroScene: "heroComplex",
     significanceLabel: "Why molecular dynamics?",
     significance: "A static structure can't tell a persistent interaction from one that merely looks right in a single frame.",
     cardGroups: [
@@ -451,25 +452,27 @@ export const SERVICES: ServiceEntry[] = [
       {
         id: "services",
         label: "Our MD services",
+        lede: "The molecular systems we simulate. Drag a model to turn it.",
+        variant: "scene",
         cards: [
-          { title: "Protein", body: "Stability, flexibility, and domain motion.", illustration: "trajectoryMotion" },
-          { title: "Protein–Ligand", body: "Pose retention and contact persistence.", illustration: "proteinSmallMolecule" },
-          { title: "Protein–Protein", body: "Interface stability across the run.", illustration: "proteinProtein" },
-          { title: "Antibody–Antigen", body: "CDR flexibility and paratope–epitope contacts.", illustration: "antibodyAntigen" },
-          { title: "Mutation / Variant", body: "Matched wild-type and variant runs, compared.", illustration: "mutationVariant" },
-          { title: "Free Energy", body: "End-state estimates, reported comparatively.", illustration: "energyLandscape" },
+          { title: "Protein", body: "Stability, flexibility and domain motion over time.", scene: "protein" },
+          { title: "Protein–Ligand", body: "How a bound ligand and its pocket contacts behave through the run.", scene: "proteinLigand" },
+          { title: "Protein–Protein", body: "Interface contacts and how consistently they hold.", scene: "proteinProtein" },
+          { title: "Antibody–Antigen", body: "CDR loop flexibility and paratope–epitope contacts.", scene: "antibodyAntigen" },
+          { title: "Mutation / Variant", body: "Matched wild-type and variant runs, compared side by side.", scene: "mutationVariant" },
+          { title: "Free-Energy", body: "Sampling of energetic states, reported comparatively.", scene: "freeEnergy" },
         ],
       },
       {
         id: "applications",
         label: "Applications of molecular dynamics",
         cards: [
-          { title: "Docking Pose Validation", body: "Test whether a docked pose stays stable and its interactions persist over time.", illustration: "contactPersistence" },
+          { title: "Docking Pose Validation", body: "Test whether a docked pose stays stable and its interactions persist over time.", scene: "proteinLigand" },
           { title: "Antibody–Antigen Dynamics", body: "Characterise Fv–antigen interfaces, CDR contacts, and binding behaviour through the run.", media: "fabLysozyme" },
-          { title: "Protein–Protein Interaction Analysis", body: "Follow interface stability, residue contacts, and hydrogen-bond networks across the trajectory.", illustration: "proteinProtein" },
+          { title: "Protein–Protein Interaction Analysis", body: "Follow interface stability, residue contacts, and hydrogen-bond networks across the trajectory.", scene: "proteinProtein" },
           { title: "Candidate Prioritization", body: "Separate candidates on stability, interaction persistence, and energetics to support experimental selection.", illustration: "candidateCompare" },
-          { title: "Mutation & Variant Analysis", body: "Evaluate how sequence changes affect stability, flexibility, and binding interfaces.", illustration: "mutationVariant" },
-          { title: "Binding & Free-Energy Analysis", body: "Estimate binding contributions with MM-PBSA/MM-GBSA and residue-level decomposition.", illustration: "energyLandscape" },
+          { title: "Mutation & Variant Analysis", body: "Evaluate how sequence changes affect stability, flexibility, and binding interfaces.", scene: "mutationVariant" },
+          { title: "Binding & Free-Energy Analysis", body: "Estimate binding contributions with MM-PBSA/MM-GBSA and residue-level decomposition.", scene: "freeEnergy" },
           { title: "Protein Stability & Conformational Dynamics", body: "Capture flexibility and conformational states that a single static structure can't show.", illustration: "structuralFluctuation" },
           { title: "Mechanistic & Structural Studies", body: "Uncover dynamic interaction networks and conformational transitions behind molecular recognition.", illustration: "trajectoryMotion" },
           { title: "Lead Optimization", body: "Compare binding modes and dynamic behaviour across a candidate series to guide design.", illustration: "leadOptimization" },
@@ -479,8 +482,8 @@ export const SERVICES: ServiceEntry[] = [
     ],
     realImages: [
       {
-        art: "conformationalEnsemble",
-        artCaption: "Original schematic: one static structure, the conformational states it samples, and the state visited over time · illustrative",
+        scene: "protein",
+        artCaption: "Illustrative MD simulation: thermal fluctuation of the whole chain, with one domain swinging about the gold hinge loop. Drag to turn.",
         kicker: "Conformational dynamics",
         title: "Protein Stability & Conformational Dynamics",
         body: "A crystal or docked structure is one snapshot. Over a trajectory the same protein flexes, rearranges and moves between conformational states — which MD resolves and quantifies.",
@@ -498,13 +501,13 @@ export const SERVICES: ServiceEntry[] = [
     analysesLabel: "What we analyse",
     analyses: [
       { name: "RMSD", meaning: "Overall structural deviation", detail: "Measures overall structural deviation relative to a reference structure across the trajectory.", chart: "rmsd" },
-      { name: "RMSF", meaning: "Residue flexibility", detail: "Measures residue-level fluctuations and highlights regions with greater molecular flexibility.", chart: "rmsf" },
-      { name: "Radius of gyration", meaning: "Compactness", detail: "Describes changes in the overall compactness of the simulated system.", chart: "rg" },
+      { name: "RMSF", meaning: "Residue-level flexibility", detail: "Measures residue-level fluctuations and highlights regions with greater molecular flexibility.", chart: "rmsf" },
+      { name: "Radius of Gyration", meaning: "Molecular compactness", detail: "Describes changes in the overall compactness of the simulated system.", chart: "rg" },
       { name: "SASA", meaning: "Solvent exposure", detail: "Evaluates solvent-accessible surface area and changes in molecular exposure during the trajectory.", chart: "sasa" },
-      { name: "Hydrogen bonds", meaning: "H-bond formation and persistence", detail: "Tracks hydrogen-bond formation and persistence between relevant interacting groups.", chart: "hbonds" },
-      { name: "Contacts / Interaction persistence", meaning: "How consistently contacts hold", detail: "Tracks residue or molecular contacts and how consistently interactions are maintained over time.", chart: "contacts" },
+      { name: "Hydrogen Bonds", meaning: "Interaction persistence", detail: "Tracks hydrogen-bond formation and persistence between relevant interacting groups.", chart: "hbonds" },
+      { name: "Contacts / Interaction Persistence", meaning: "Residue interaction persistence", detail: "Tracks residue or molecular contacts and how consistently interactions are maintained over time.", chart: "contacts" },
       { name: "PCA", meaning: "Collective motion", detail: "Examines dominant collective motions and major conformational changes across the simulation.", chart: "pca" },
-      { name: "MM-PBSA / MM-GBSA", meaning: "Binding-related energetics", detail: "Estimates binding-related energetic contributions for suitable simulated complexes and can support comparative analysis.", chart: "energy" },
+      { name: "MM-PBSA / MM-GBSA", meaning: "Binding-related energetic analysis", detail: "Estimates binding-related energetic contributions for suitable simulated complexes and can support comparative analysis.", chart: "mmpbsa" },
     ],
     deliverables: [
       { title: "Trajectory", glyph: "trajectory" },

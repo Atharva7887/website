@@ -1,5 +1,5 @@
 // Renders PDB coordinates into Goodsell-style space-filling SVGs for public/structures.
-// Usage: node scripts/render-pdb.mjs <dir containing 1IGT.pdb 3HFM.pdb 1HSG.pdb 1BRS.pdb>
+// Usage: node scripts/render-pdb.mjs <dir containing 1IGT.pdb 3HFM.pdb 1HSG.pdb>
 // Source files: https://files.rcsb.org/download/<ID>.pdb (PDB data is CC0). Not committed.
 import fs from "node:fs";
 import path from "node:path";
@@ -203,21 +203,5 @@ const NAVY = "#1E5BA8", NAVY_L = "#7FA6DA", GOLD = "#F4C430", GOLD_D = "#C9920F"
     colorOf: (p) => (p.resn === "MK1" ? GOLD : p.chain === "A" ? NAVY : NAVY_L),
     groupOf: (p) => (p.resn === "MK1" ? "lig" : ""), moving: true,
     style: ".lig{animation:dock 7s cubic-bezier(.16,1,.3,1) infinite}@keyframes dock{0%{transform:translate(38px,-26px);opacity:0}12%{opacity:1}45%,88%{transform:none;opacity:1}100%{transform:none;opacity:0}}",
-  });
-}
-
-/* 1BRS — barnase (A) with barstar (D). Barstar docks in; interface highlighted. */
-{
-  const all = parse("1BRS");
-  const a = all.filter((p) => (p.chain === "A" || p.chain === "D") && !p.het);
-  center(a); pcaAlign(a); rotate(a, { x: 90 });
-  const iA = interfaceResidues(a, ["A"], ["D"]), iD = interfaceResidues(a, ["D"], ["A"]);
-  const k = (p) => `${p.chain}${p.resi}`;
-  render("1BRS", a, {
-    file: "barnase-barstar-1brs.svg",
-    title: "Barnase and barstar protein–protein complex with the interface highlighted, PDB 1BRS",
-    colorOf: (p) => (p.chain === "A" ? (iA.has(k(p)) ? GOLD_D : NAVY) : iD.has(k(p)) ? GOLD : SAND),
-    groupOf: (p) => (p.chain === "D" ? "partner" : ""), moving: true,
-    style: ".partner{animation:assoc 8s cubic-bezier(.16,1,.3,1) infinite}@keyframes assoc{0%{transform:translate(24px,0)}40%,85%{transform:none}100%{transform:translate(24px,0)}}",
   });
 }

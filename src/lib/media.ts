@@ -10,6 +10,11 @@
  *
  * Schematic SVG illustrations live in components/science/Illustrations.tsx and
  * are original; they are not listed here.
+ *
+ * public/pdb/{1HSG,1BRS,3HFM}.pdb are RCSB entries (CC0) trimmed by
+ * scripts/trim-pdb.mjs. They feed the live 3D scenes in Docking → What we
+ * analyse (components/docking), which compute pockets, interfaces and contact
+ * distances from those coordinates.
  */
 
 export type MediaAsset = {
@@ -77,7 +82,6 @@ export const MEDIA = {
     license: "PDB data CC0; render original",
     usedOn: [
       "/services/structural-analysis",
-      "/services/molecular-docking (Residue-Level Interaction Mapping card)",
       "/services/molecular-dynamics (Antibody–Antigen Dynamics card)",
     ],
   },
@@ -92,18 +96,6 @@ export const MEDIA = {
     source: "RCSB PDB 1HSG (HIV-1 protease + indinavir)",
     license: "PDB data CC0; render original",
     usedOn: ["/services/molecular-docking (hero)"],
-  },
-  barnaseBarstar: {
-    src: "/structures/barnase-barstar-1brs.svg",
-    kind: "structure",
-    alt: "Barnase (navy) and barstar (sand) meeting at a protein–protein interface highlighted in gold",
-    width: 640,
-    height: 352,
-    credit: "Rendered by IndiskaAI from PDB 1BRS · interface computed at 4.5 Å, motion illustrative",
-    creditUrl: pdb("1BRS"),
-    source: "RCSB PDB 1BRS (barnase–barstar)",
-    license: "PDB data CC0; render original",
-    usedOn: ["/services/molecular-docking (Binding Interface Characterization card)"],
   },
   /* Docking-type renders — supplied by IndiskaAI as card images; cropped and
      background-removed by scripts/cutout-docking-types.mjs. Illustrative
@@ -173,6 +165,54 @@ export const MEDIA = {
     source: "Supplied by IndiskaAI (docking-type card image)",
     license: "Project-owned — confirm usage rights for AI-generated imagery",
     usedOn: ["/services/molecular-docking (Docking types)"],
+  },
+  /* Antibody Discovery pathway-card scenes — supplied by IndiskaAI as AI
+     renders; cropped and background-removed by scripts/cutout-scenes.mjs.
+     Source filenames did not match their content 1:1 (three were rotated
+     between concepts); usedOn reflects the corrected mapping. */
+  leadOptimizationScene: {
+    src: "/generated/lead-optimization-data.webp",
+    kind: "render",
+    alt: "One antibody structure branching into six variant antibodies of differing shade, with the best-ranked one glowing gold",
+    width: 900,
+    height: 496,
+    credit: "Illustrative AI render",
+    source: "Supplied by IndiskaAI",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/antibody-discovery (Lead Optimization Data card)"],
+  },
+  ngsDataScene: {
+    src: "/generated/ngs-data.webp",
+    kind: "render",
+    alt: "Many sequencing-read strands converging into a folded structure, with a small cluster of candidate antibodies emerging",
+    width: 900,
+    height: 502,
+    credit: "Illustrative AI render",
+    source: "Supplied by IndiskaAI",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/antibody-discovery (NGS Data card)"],
+  },
+  deNovoScene: {
+    src: "/generated/de-novo-design.webp",
+    kind: "render",
+    alt: "A target epitope surface and a folded structure, with candidate antibodies materialising from gold particle sparkles",
+    width: 900,
+    height: 483,
+    credit: "Illustrative AI render",
+    source: "Supplied by IndiskaAI",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/antibody-discovery (De Novo card)"],
+  },
+  epitopeIdScene: {
+    src: "/generated/epitope-identification.webp",
+    kind: "render",
+    alt: "A protein surface with two regions highlighted in gold, marking candidate epitopes, with an antibody approaching",
+    width: 900,
+    height: 535,
+    credit: "Illustrative AI render",
+    source: "Supplied by IndiskaAI",
+    license: "Project-owned — confirm usage rights for AI-generated imagery",
+    usedOn: ["/services/antibody-discovery (Epitope Identification card)"],
   },
 } as const satisfies Record<string, MediaAsset>;
 
