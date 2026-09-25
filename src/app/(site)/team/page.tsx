@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
+import FounderSpotlight from "@/components/FounderSpotlight";
 import { getTeamMembers, type TeamMemberDoc } from "../../../../sanity/lib/fetch";
 import { urlForImage } from "../../../../sanity/lib/image";
 
@@ -139,7 +140,6 @@ function TeamGrid({
 
 export default async function TeamPage() {
   const all = await getTeamMembers();
-  const leadership = all.filter(isLeadership);
   const scientists = all.filter((m) => !isLeadership(m));
 
   return (
@@ -156,13 +156,7 @@ export default async function TeamPage() {
       />
 
       <section className="py-10 md:py-14">
-        <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-          <div className="kicker mb-8 md:mb-10">Leadership Team</div>
-          <TeamGrid
-            members={leadership}
-            emptyHint="No leadership entries yet. Add one in /studio under Team Member with Group = Leadership."
-          />
-        </div>
+        <FounderSpotlight />
       </section>
 
       <section className="py-12 md:py-20">
