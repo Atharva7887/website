@@ -20,7 +20,7 @@ const SERIES: Series[] = [
   { key: "a", name: "Candidate A", color: "#1E5BA8" },
   { key: "b", name: "Candidate B", color: "#D9A91A", dash: "6 4" },
   { key: "c", name: "Candidate C", color: "#6B6B6B" },
-  { key: "d", name: "Candidate D", color: "#12876F", dash: "1 4" },
+  { key: "d", name: "AI-assisted candidate D", color: "#12876F", dash: "1 4" },
 ];
 
 const GRID = "rgba(26,26,26,0.07)";
@@ -162,7 +162,7 @@ function LineChart({ o, W, H }: { o: LineCfg; W: number; H: number }) {
         <path key={`l${s.key}`} ref={(e) => { lines.current[k] = e; }} fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" strokeDasharray={s.dash} />
       ))}
       {!narrow && S.map((s, k) => (
-        <text key={`t${s.key}`} ref={(e) => { labs.current[k] = e; }} fontSize={11} fontWeight={600} fill={s.color} dominantBaseline="middle">{s.name.replace("Candidate ", "")}</text>
+        <text key={`t${s.key}`} ref={(e) => { labs.current[k] = e; }} fontSize={11} fontWeight={600} fill={s.color} dominantBaseline="middle">{s.key.toUpperCase()}</text>
       ))}
     </svg>
   );
