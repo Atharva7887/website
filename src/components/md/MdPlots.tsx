@@ -405,7 +405,7 @@ const envFrom = (floor: number, tau: number) => (x: number) => floor + (1 - floo
 const TIME_TICKS = [0, 20, 40, 60, 80, 100];
 
 const RMSD: LineCfg = {
-  x0: 0, x1: 100, y0: 0, y1: 3.5, yTicks: [0, 1, 2, 3], yFmt: (v) => v.toFixed(1), xTicks: TIME_TICKS, xLabel: "Time (ns)", yLabel: "RMSD (Å)",
+  x0: 0, x1: 100, y0: 0, y1: 3.5, yTicks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], yFmt: (v) => v.toFixed(1), xTicks: TIME_TICKS, xLabel: "Time (ns)", yLabel: "RMSD (Å)",
   data: {
     a: { f: rise(0.3, 2.42, 7, (x) => 0.2 / (1 + Math.exp(-(x - 58) / 3))), env: envRise(7), noise: 0.075, sd: 0.2, drift: 0.05, dph: 0 },
     b: { f: rise(0.3, 2.05, 6), env: envRise(6), noise: 0.065, sd: 0.16, drift: 0.04, dph: 1.7 },
@@ -413,7 +413,7 @@ const RMSD: LineCfg = {
   },
 };
 const RG: LineCfg = {
-  x0: 0, x1: 100, y0: 1.8, y1: 2.0, yTicks: [1.8, 1.85, 1.9, 1.95, 2.0], yFmt: (v) => v.toFixed(2), xTicks: TIME_TICKS, xLabel: "Time (ns)", yLabel: "Rg (nm)",
+  x0: 0, x1: 100, y0: 1.75, y1: 2.05, yTicks: [1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.05], yFmt: (v) => v.toFixed(2), xTicks: TIME_TICKS, xLabel: "Time (ns)", yLabel: "Rg (nm)",
   data: {
     a: { f: settle(1.905, 1.955, 12, 0.012), env: envFrom(0.6, 8), noise: 0.0065, sd: 0.014, drift: 0.004, dph: 0 },
     b: { f: settle(1.905, 1.925, 10), env: envFrom(0.6, 8), noise: 0.0055, sd: 0.011, drift: 0.003, dph: 1.4 },
@@ -421,7 +421,7 @@ const RG: LineCfg = {
   },
 };
 const SASA: LineCfg = {
-  x0: 0, x1: 100, y0: 94, y1: 116, yTicks: [94, 100, 106, 112], yFmt: (v) => String(v), xTicks: TIME_TICKS, xLabel: "Time (ns)", yLabel: "SASA (nm²)",
+  x0: 0, x1: 100, y0: 94, y1: 116, yTicks: [94, 98, 102, 106, 110, 114], yFmt: (v) => String(v), xTicks: TIME_TICKS, xLabel: "Time (ns)", yLabel: "SASA (nm²)",
   data: {
     a: { f: decay(112.5, 106.2, 45), env: envFrom(0.7, 10), noise: 0.55, sd: 1.1, drift: 0.35, dph: 0 },
     b: { f: decay(110.8, 104.1, 40), env: envFrom(0.7, 10), noise: 0.5, sd: 0.95, drift: 0.3, dph: 1.3 },
@@ -430,7 +430,7 @@ const SASA: LineCfg = {
 };
 const RMSF: BarCfg = {
   cats: ["L4", "S25", "G26", "Y27", "T28", "S31", "Y32", "W47", "I51", "S52", "G54", "Y59", "R94", "D99", "G100", "Y101", "F102", "W103"],
-  v0: 0, v1: 3.5, ticks: [0, 1, 2, 3], fmt: (v) => v.toFixed(1), xLabel: "Residue", yLabel: "RMSF (Å)", margin: { b: 38 }, wobble: 0.035,
+  v0: 0, v1: 3.5, ticks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], fmt: (v) => v.toFixed(1), xLabel: "Residue", yLabel: "RMSF (Å)", margin: { b: 38 }, wobble: 0.035,
   regions: [{ from: 2, to: 6, label: "LOOP 1" }, { from: 8, to: 11, label: "LOOP 2" }, { from: 13, to: 16, label: "LOOP 3" }],
   values: {
     a: [1.05, 0.72, 1.32, 1.58, 1.46, 1.62, 1.2, 0.48, 0.92, 1.3, 1.48, 0.88, 0.62, 2.35, 2.98, 2.62, 1.72, 0.64],
@@ -441,7 +441,7 @@ const RMSF: BarCfg = {
 const HBONDS: BarCfg = {
   cats: ["Y32 OH · E45 OE1", "R58 NH2 · D72 OD2", "Y101 OH · K49 NZ", "S31 OG · N47 OD1", "D99 OD1 · R22 NH1"],
   shortCats: ["Y32–E45", "R58–D72", "Y101–K49", "S31–N47", "D99–R22"],
-  horizontal: true, v0: 0, v1: 100, ticks: [0, 25, 50, 75, 100], fmt: (v) => `${v}%`, xLabel: "Occupancy (% of frames)", margin: { r: 18 }, wobble: 0.025,
+  horizontal: true, v0: 0, v1: 100, ticks: [0, 20, 40, 60, 80, 100], fmt: (v) => `${v}%`, xLabel: "Occupancy (% of frames)", margin: { r: 18 }, wobble: 0.025,
   values: { a: [82, 71, 44, 26, 12], b: [86, 76, 55, 33, 18], c: [94, 88, 78, 58, 41] },
 };
 const MMPBSA: BarCfg = {
@@ -455,7 +455,7 @@ const CONTACTS: RasterCfg = {
   p: { a: [0.86, 0.72, 0.44, 0.3, 0.18], b: [0.9, 0.78, 0.55, 0.38, 0.24], c: [0.97, 0.92, 0.8, 0.64, 0.48] },
 };
 const PCA: ScatterCfg = {
-  x0: -6, x1: 6, y0: -4, y1: 4, xTicks: [-6, -3, 0, 3, 6], yTicks: [-4, -2, 0, 2, 4], jit: 0.09, xLabel: "PC1 (nm)", yLabel: "PC2 (nm)",
+  x0: -6, x1: 6, y0: -4, y1: 4, xTicks: [-6, -4, -2, 0, 2, 4, 6], yTicks: [-4, -2, 0, 2, 4], jit: 0.09, xLabel: "PC1 (38.4% variance, nm)", yLabel: "PC2 (16.9%, nm)",
   basins: {
     a: [{ x: -2.6, y: -1.2, sx: 1.05, sy: 0.75, rho: 0.25, n: 46 }, { x: 3.0, y: 1.5, sx: 0.9, sy: 0.7, n: 30 }, { x: 0.3, y: 0.1, sx: 0.9, sy: 0.5, rho: 0.4, n: 8 }],
     b: [{ x: -2.0, y: -0.7, sx: 0.85, sy: 0.65, rho: 0.2, n: 52 }, { x: 2.1, y: 1.3, sx: 0.6, sy: 0.5, n: 16 }],
