@@ -50,7 +50,7 @@ const links: NavLink[] = [
   },
   {
     label: "About Us",
-    href: "/#about",
+    href: "/about",
     groups: [
       {
         items: [

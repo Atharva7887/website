@@ -143,12 +143,13 @@ const DEFAULT_RESEARCH: ResearchEntryDoc[] = [
 
 const DEFAULT_TEAM: TeamMemberDoc[] = [
   {
-    name: "Atharva Shirke",
+    name: "Jaspal Patil",
     role: "Founder & CEO",
-    bio: "Founded IndiskaAI to bridge generative AI and structural biology in service of better therapeutics.",
+    bio: "20+ years across pharmaceutical sciences, biomedical research, and drug discovery. Building IndiskaAI at the intersection of AI, computational biology, and therapeutic development.",
     accent: "navy",
     group: "leadership",
     order: 1,
+    linkedinUrl: "https://in.linkedin.com/in/jaspalpatil",
   },
   {
     name: "—",
