@@ -4,214 +4,162 @@ import { notFound } from "next/navigation";
 import PageHeader from "@/components/PageHeader";
 import Reveal from "@/components/Reveal";
 import MotionStory from "@/components/science/MotionStory";
-import ScienceFigure from "@/components/science/ScienceFigure";
-import VisualPipeline, { type PipelineStep } from "@/components/science/VisualPipeline";
+import { VolcanoPlot, ExpressionHeatmap } from "@/components/science/BiomarkerPlots";
 import { GlyphTile, type GlyphName } from "@/components/science/Glyphs";
-import type { IllustrationName } from "@/components/science/Illustrations";
 import { Section, SectionHead, ServiceCTA } from "@/components/service/ServiceSections";
 import { getService } from "@/lib/services-data";
 
 export const metadata: Metadata = {
   title: "AI-Assisted Biomarker Identification",
   description:
-    "Sequencing data in. Defensible biomarker signatures out. Cross-validated biomarker panels from sequencing and multi-omics data, plus AI-assisted target-to-candidate analysis.",
+    "RNA sequencing data in. Survival-linked gene signatures out. A compact, cross-validated gene signature from raw RNA-seq reads and patient survival data.",
 };
 
-const SOURCES = [
-  { label: "Gene" },
-  { label: "Transcript" },
-  { label: "Protein" },
-  { label: "Metabolite" },
-  { label: "Cell population" },
-  { label: "Imaging feature" },
+const WHY_QUESTIONS = ["Who has it?", "Who will progress?", "Who will respond?"];
+
+const FUNNEL: { n: string; title: string; body: string; glyph: GlyphName }[] = [
+  { n: "1", title: "Input data", body: "Sequencing reads from patient samples", glyph: "fastq" },
+  { n: "2", title: "Signal", body: "Genes whose activity differs between patient groups", glyph: "signal" },
+  { n: "3", title: "Processing", body: "Noise filtered out, the signal tested and modelled", glyph: "qc" },
+  { n: "4", title: "Marker", body: "A small set of genes that tracks the outcome", glyph: "shortlist" },
+  { n: "5", title: "Decision", body: "Patients stratified, trials designed, treatment tracked", glyph: "handoff" },
 ];
 
-const READS = [
-  { q: "Is disease present?", glyph: "diagnostic" as GlyphName },
-  { q: "How is it likely to behave?", glyph: "prognostic" as GlyphName },
-  { q: "Is a treatment working?", glyph: "pharmacodynamic" as GlyphName },
-];
+type Assist = {
+  marker: string;
+  question: string;
+  howWeAssist: string;
+  studyNeeds: string;
+  scope: "Full pipeline" | "Candidate genes";
+  glyph: GlyphName;
+};
 
-const TYPES: { type: string; tells: string; glyph: GlyphName }[] = [
-  { type: "Diagnostic", tells: "Whether a disease is present, and which relevant state or subtype.", glyph: "diagnostic" },
-  { type: "Prognostic", tells: "How a patient is likely to progress, regardless of treatment.", glyph: "prognostic" },
-  { type: "Predictive", tells: "Whether a patient is likely to respond to a specific therapy.", glyph: "predictive" },
-  { type: "Pharmacodynamic / Response", tells: "Whether a treatment is engaging its target or producing the expected biological effect.", glyph: "pharmacodynamic" },
-  { type: "Monitoring", tells: "How a disease or response changes over time.", glyph: "monitoring" },
-  { type: "Safety", tells: "Potential treatment-related harm, ideally before toxicity is clinically apparent.", glyph: "safety" },
-  { type: "Susceptibility / Risk", tells: "Who may be at increased risk of developing a disease.", glyph: "risk" },
-];
-
-const MODALITIES: { name: string; sub: string; glyph: GlyphName }[] = [
-  { name: "Genomics", sub: "DNA / variants", glyph: "dna" },
-  { name: "Transcriptomics", sub: "RNA / expression", glyph: "rna" },
-  { name: "Proteomics", sub: "Protein abundance", glyph: "protein" },
-  { name: "Metabolomics", sub: "Metabolites", glyph: "metabolite" },
-  { name: "Cellular", sub: "Cell populations", glyph: "cell" },
-  { name: "Immune", sub: "Immune signatures", glyph: "immune" },
-  { name: "Imaging", sub: "Spatial / imaging features", glyph: "imaging" },
-];
-
-const PIPELINES: { title: string; lede: string; steps: PipelineStep[]; capabilities: string[] }[] = [
+const ASSIST: Assist[] = [
   {
-    title: "RNA-Seq Analysis Pipeline",
-    lede: "Raw FASTQ to an interpreted result, version-controlled at every step.",
-    steps: [
-      { title: "FASTQ", glyph: "fastq" },
-      { title: "QC", glyph: "qc" },
-      { title: "Alignment", glyph: "align" },
-      { title: "Quantification", glyph: "rank" },
-      { title: "Differential expression", glyph: "compare" },
-      { title: "Pathways", glyph: "pathway" },
-      { title: "Interpretation", glyph: "report" },
-    ],
-    capabilities: [
-      "Quality control, trimming, alignment, and quantification",
-      "Differential expression, pathway and gene-set enrichment",
-      "Cell-type deconvolution and immune profiling",
-      "Fusion, splice-variant and isoform-level analysis",
-      "Batch-effect correction across cohorts and sites",
-      "Submission-ready figures, tables, and a versioned report",
-    ],
+    marker: "Prognostic",
+    question: "How will patients progress?",
+    howWeAssist: "We take your cohort through the full pipeline to a compact gene signature associated with survival, and a risk score for each patient.",
+    studyNeeds: "RNA-seq samples with survival time and event status for each patient.",
+    scope: "Full pipeline",
+    glyph: "prognostic",
   },
   {
-    title: "Biomarker Discovery Pipeline",
-    lede: "Takes processed data, finds the signature, then stress-tests it before reviewers do.",
-    steps: [
-      { title: "Data", glyph: "data" },
-      { title: "Features", glyph: "map" },
-      { title: "Candidates", glyph: "candidate" },
-      { title: "ML selection", glyph: "classify" },
-      { title: "Validation", glyph: "validate" },
-      { title: "Compact panel", glyph: "shortlist" },
-      { title: "Evidence", glyph: "report" },
-    ],
-    capabilities: [
-      "Candidate marker identification across single and multi-omics inputs",
-      "Machine-learning feature selection down to a compact, assay-ready panel",
-      "Cross-validation, plus validation on an independent cohort where one is available",
-      "Survival, response, and patient-stratification modelling",
-      "Panel scoring on effect size, robustness, and assay feasibility",
-      "A ranked shortlist with the evidence — and the limits — for every marker",
-    ],
+    marker: "Diagnostic",
+    question: "Is the disease present?",
+    howWeAssist: "We compare diseased and healthy samples to identify candidate genes that separate them, with pathway context.",
+    studyNeeds: "RNA-seq samples from disease and control groups.",
+    scope: "Candidate genes",
+    glyph: "diagnostic",
   },
+  {
+    marker: "Predictive",
+    question: "Who will respond to treatment?",
+    howWeAssist: "We compare responders with non-responders to identify candidate genes linked to treatment response.",
+    studyNeeds: "Pre-treatment samples with known response status.",
+    scope: "Candidate genes",
+    glyph: "predictive",
+  },
+  {
+    marker: "Response",
+    question: "Is the treatment having an effect?",
+    howWeAssist: "We compare treated and untreated samples to show which genes and pathways the treatment changes.",
+    studyNeeds: "Treated and untreated (or before and after) samples.",
+    scope: "Candidate genes",
+    glyph: "pharmacodynamic",
+  },
+  {
+    marker: "Monitoring",
+    question: "How is the disease changing over time?",
+    howWeAssist: "We compare samples across time points to identify genes whose activity follows disease course.",
+    studyNeeds: "Samples collected at two or more time points.",
+    scope: "Candidate genes",
+    glyph: "monitoring",
+  },
+];
+
+type Package = {
+  kicker: string;
+  title: string;
+  body: string;
+  receive: string[];
+  note?: string;
+};
+
+const END_TO_END: Package = {
+  kicker: "End to end",
+  title: "Prognostic Biomarker Discovery",
+  body: "From raw RNA sequencing reads to a compact gene signature associated with patient survival.",
+  receive: [
+    "Candidate prognostic genes",
+    "The final gene signature with hazard ratios",
+    "A risk score for each patient",
+    "A written report with result tables and figures",
+  ],
+  note: "Requires survival data for each patient.",
+};
+
+const STAGE_PACKAGES: Package[] = [
+  {
+    kicker: "Data processing",
+    title: "Sequencing Data Quality Assessment",
+    body: "Find out whether your RNA-seq data is fit for analysis before investing further.",
+    receive: ["Per-sample quality report", "A summary of any issues found"],
+  },
+  {
+    kicker: "Data processing",
+    title: "RNA-Seq Data Processing",
+    body: "Raw sequencing reads turned into an analysis-ready gene expression matrix.",
+    receive: ["Gene-level counts matrix", "A processing quality summary"],
+  },
+  {
+    kicker: "Expression analysis",
+    title: "Differential Expression & Pathway Analysis",
+    body: "Identify the genes that change between your groups and the pathways behind them.",
+    receive: ["Gene list with fold changes and adjusted p-values", "Enriched pathways, and plots"],
+  },
+];
+
+type PipelineStep = { n: number; title: string };
+const STAGE_1: PipelineStep[] = [
+  { n: 1, title: "Quality check" },
+  { n: 2, title: "Alignment" },
+  { n: 3, title: "Quantification" },
+];
+const STAGE_2: PipelineStep[] = [
+  { n: 4, title: "Differential expression" },
+  { n: 5, title: "Pathway enrichment" },
+];
+const STAGE_3: PipelineStep[] = [
+  { n: 6, title: "Survival screening" },
+  { n: 7, title: "Feature selection" },
+  { n: 8, title: "Signature modelling" },
+];
+
+const READING_GUIDE = [
+  { label: "Right side, red", body: "Genes more active in your first group." },
+  { label: "Left side, blue", body: "Genes more active in your second group." },
+  { label: "Higher up", body: "Stronger statistical support for the change." },
 ];
 
 const EVIDENCE: { title: string; body: string; glyph: GlyphName }[] = [
-  { title: "Cross-validated", body: "Selection is repeated across folds of the discovery cohort, so a marker must hold up on data it wasn't chosen from.", glyph: "rearrange" },
-  { title: "Independent cohort", body: "Where a second cohort exists, the locked panel is scored on it untouched.", glyph: "validate" },
-  { title: "Limits stated", body: "Each marker ships with effect size, stability, and what the data can't support.", glyph: "report" },
+  { title: "Cross-validated selection", body: "Genes are selected with cross-validation, so the signature isn't tuned to one arrangement of the data.", glyph: "rearrange" },
+  { title: "Independent of clinical factors", body: "The final genes are tested alongside clinical variables such as age and stage, so their value is their own.", glyph: "validate" },
+  { title: "Limits stated", body: "Every result comes with its effect size, statistical support, and what the data can't support.", glyph: "report" },
 ];
 
-/** Six measurable sources converging on one signal; labels live in the SVG so they stay aligned at any width. */
-function SignalDiagram() {
-  const rowH = 40;
-  return (
-    <svg viewBox="0 0 440 250" className="h-auto w-full" role="img" aria-labelledby="sig-title">
-      <title id="sig-title">A gene, transcript, protein, metabolite, cell population, or imaging feature can each provide the measurable biomarker signal</title>
-      {SOURCES.map((s, i) => {
-        const y = 22 + i * rowH;
-        const hot = i === 2;
-        return (
-          <g key={s.label}>
-            <rect x="2" y={y - 14} width="150" height="28" rx="14" fill={hot ? "rgba(244,196,48,0.28)" : "rgba(30,91,168,0.07)"} stroke={hot ? "#F4C430" : "rgba(30,91,168,0.35)"} />
-            <circle cx="18" cy={y} r="4" fill={hot ? "#D9A91A" : "#1E5BA8"} />
-            <text x="30" y={y + 5} fontSize="14" fill="#1A1A1A" fontFamily="var(--font-inter), sans-serif">{s.label}</text>
-            <path d={`M152 ${y} C240 ${y} 262 122 332 122`} fill="none" stroke={hot ? "#F4C430" : "rgba(26,26,26,0.22)"} strokeWidth={hot ? 2.2 : 1.3} strokeLinecap="round" />
-          </g>
-        );
-      })}
-      <circle className="sci-pulse" cx="370" cy="122" r="36" fill="rgba(244,196,48,0.25)" stroke="#F4C430" strokeWidth="2" />
-      <circle cx="370" cy="122" r="12" fill="#F4C430" stroke="#1A1A1A" strokeWidth="1.2" />
-      <text x="370" y="180" fontSize="12" textAnchor="middle" fill="#6B6B6B" letterSpacing="1.4" fontFamily="var(--font-inter), sans-serif">SIGNAL</text>
-    </svg>
-  );
-}
-
-type Stage = {
-  title: string;
-  method: string;
-  body: string;
-  art: IllustrationName;
-  chain?: string[];
-  link?: { href: string; label: string };
-  caption?: string;
-};
-
-/** Target → candidate workflow. Each stage states its method; none claims efficacy. */
-const STAGES: Stage[] = [
-  {
-    title: "Drug Target Identification",
-    method: "AI-assisted",
-    body: "Identify and prioritise candidate targets from available biological evidence and project-specific data.",
-    art: "targetIdentification",
-    chain: ["Biological data", "Disease / pathway signals", "Candidate targets"],
-  },
-  {
-    title: "Structure-Based Virtual Screening",
-    method: "AI / computational screening",
-    body: "A compound library is screened computationally against the target's binding site.",
-    art: "virtualScreening",
-    chain: ["Target structure", "Compound library", "Ranked candidates"],
-  },
-  {
-    title: "Candidate Prioritisation",
-    method: "Predicted scoring",
-    body: "Top-ranked compounds are prioritised by the selected scoring function and predicted binding metrics.",
-    art: "candidateRanking",
-    caption: "Predicted / computational ranking — not experimental affinity.",
-  },
-  {
-    title: "Structural Docking",
-    method: "Structure-based",
-    body: "Shortlisted candidates are docked to generate and rank predicted binding poses.",
-    art: "dockingPoses",
-    chain: ["Target + candidate", "Predicted poses", "Pose ranking"],
-    link: { href: "/services/molecular-docking", label: "Molecular Docking" },
-  },
-  {
-    title: "Molecular Dynamics",
-    method: "Physics-based simulation",
-    body: "Selected poses are simulated to assess stability, interaction persistence, and conformational behaviour.",
-    art: "trajectoryMotion",
-    chain: ["Selected poses", "MD trajectory", "Dynamic behaviour"],
-    link: { href: "/services/molecular-dynamics", label: "Molecular Dynamics" },
-  },
-  {
-    title: "Comparative Analysis",
-    method: "Comparative",
-    body: "Candidates are compared on structural, dynamic, and energetic evidence to support downstream selection.",
-    art: "candidateCompare",
-  },
+type WorkOption = { option: string; provide: string; services: string };
+const WORK_OPTIONS: WorkOption[] = [
+  { option: "Complete biomarker discovery", provide: "Raw sequencing files + survival data", services: "All stages" },
+  { option: "Discovery from counts", provide: "Gene counts matrix + survival data", services: "Stages 2–3" },
+  { option: "Expression analysis only", provide: "Gene counts matrix", services: "Stage 2" },
+  { option: "Data quality check", provide: "Raw sequencing files or counts matrix", services: "Stages 1–2" },
 ];
 
-const TERMS: { term: string; def: string }[] = [
-  { term: "Biomarker identification", def: "Finding measurable biological signatures and candidate markers." },
-  { term: "Drug target identification", def: "Identifying and prioritising biological targets relevant to a disease or therapeutic hypothesis." },
-  { term: "Virtual screening", def: "Searching a compound set computationally against a target." },
-  { term: "Docking", def: "Predicting candidate binding poses and interactions." },
-  { term: "Molecular dynamics", def: "Evaluating the dynamic behaviour of selected modelled systems." },
-  { term: "Comparative analysis", def: "Comparing candidates on computational structural and dynamic evidence." },
+const WHAT_WE_NEED = [
+  "RNA sequencing files (FASTQ) or a gene counts matrix",
+  "Sample information, including each sample's group",
+  "For prognostic work: survival time and event status per patient",
 ];
-
-/** Illustrative decision matrix: 3 = strong, 2 = mixed, 1 = weak. */
-const CRITERIA = ["Stability", "Interaction persistence", "Structural behaviour", "Energetic metrics", "Interface analysis"];
-const CANDIDATES: { name: string; scores: number[]; rank: number }[] = [
-  { name: "Candidate A", scores: [3, 3, 3, 2, 3], rank: 1 },
-  { name: "Candidate B", scores: [2, 2, 3, 3, 2], rank: 2 },
-  { name: "Candidate C", scores: [1, 1, 2, 2, 1], rank: 3 },
-];
-const LEVEL = ["", "Weak", "Mixed", "Strong"];
-
-function Dots({ n }: { n: number }) {
-  return (
-    <span className="inline-flex gap-1" aria-hidden>
-      {[1, 2, 3].map((i) => (
-        <span key={i} className={`h-2.5 w-2.5 rounded-full ${i <= n ? (n === 3 ? "bg-gold" : "bg-cream-100") : "bg-cream-100/15"}`} />
-      ))}
-    </span>
-  );
-}
 
 function Check() {
   return (
@@ -219,6 +167,52 @@ function Check() {
       <circle cx="8" cy="8" r="7.5" fill="#1E5BA8" />
       <path d="M4.8 8.2 L7 10.3 L11.3 5.8" stroke="#FAF7F0" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+function PackageCard({ p, featured }: { p: Package; featured?: boolean }) {
+  return (
+    <article
+      className={`relative overflow-hidden rounded-3xl border p-6 md:p-8 ${
+        featured ? "border-black/[0.08] bg-cream-50 shadow-[0_24px_60px_-44px_rgba(16,53,101,0.45)] lg:col-span-3" : "border-black/[0.07] bg-cream-50 lg:col-span-1"
+      }`}
+    >
+      <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${featured ? "bg-navy" : "bg-gold"}`} />
+      <div className="kicker text-navy/70">{p.kicker}</div>
+      <h3 className={`mt-2 font-display leading-[1.05] tracking-tightest text-ink ${featured ? "text-[clamp(1.4rem,2.6vw,1.9rem)]" : "text-[1.25rem]"}`}>{p.title}</h3>
+      <p className="mt-3 text-ink-soft text-[0.94rem] leading-[1.55] max-w-[52ch]">{p.body}</p>
+
+      <div className="mt-6">
+        <div className="kicker mb-3 text-ink-muted">You receive</div>
+        <ul className="space-y-2.5">
+          {p.receive.map((r) => (
+            <li key={r} className="flex gap-3 text-[0.9rem] leading-[1.5] text-ink">
+              <Check />
+              {r}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {p.note && <p className="mt-5 text-[0.78rem] text-ink-muted">{p.note}</p>}
+    </article>
+  );
+}
+
+function StageColumn({ title, steps, tint }: { title: string; steps: PipelineStep[]; tint: "navy" | "gold" }) {
+  return (
+    <div className="flex flex-col rounded-2xl border border-black/[0.07] bg-cream-50 p-5 md:p-6">
+      <div className={`kicker mb-4 ${tint === "navy" ? "text-navy/70" : "text-gold-600"}`}>{title}</div>
+      <ol className="space-y-3">
+        {steps.map((s) => (
+          <li key={s.n} className="flex items-center gap-3">
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[0.72rem] font-medium tabular-nums ${tint === "navy" ? "bg-navy text-cream-100" : "bg-gold text-ink"}`}>
+              {s.n}
+            </span>
+            <span className="text-[0.92rem] leading-snug text-ink">{s.title}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
@@ -232,7 +226,7 @@ export default function BiomarkerPage() {
         crumbs={[{ label: "Services", href: "/services" }, { label: "Biomarker Identification" }]}
         eyebrow="Computational science"
         title="AI-Assisted Biomarker Identification"
-        lede="Sequencing data in. Defensible biomarker signatures out."
+        lede="RNA sequencing data in. Survival-linked gene signatures out."
         cta={
           <>
             <Link href="/partner" className="cta">
@@ -244,199 +238,221 @@ export default function BiomarkerPage() {
         }
         aside={
           <MotionStory
-            label="Data to signature"
-            description="A samples-by-features matrix, a correlation network, a funnel to candidates, and cross-validation folds"
+            label="Reads to signature"
+            description="Raw sequencing reads, a correlation network of candidate signals, a funnel narrowing to a compact panel, and cross-validation folds"
             frames={[
-              { art: "sampleMatrix", title: "Data", caption: "Sequencing and multi-omics data, after QC and normalisation." },
-              { art: "biomarkerNetwork", title: "Signals", caption: "Correlated features cluster into candidate signals." },
-              { art: "screeningFunnel", title: "Selection", caption: "Feature selection narrows to a compact panel." },
-              { art: "validationFolds", title: "Stress-test", caption: "Cross-validation, then an independent cohort where one exists." },
+              { art: "sampleMatrix", title: "In", caption: "Raw reads from your samples, with patient survival information." },
+              { art: "biomarkerNetwork", title: "Through", caption: "Our biomarker discovery pipeline, developed and run in-house." },
+              { art: "screeningFunnel", title: "Narrowing", caption: "Feature selection narrows to a compact signature." },
+              { art: "validationFolds", title: "Out", caption: "A compact gene signature, with the evidence behind every gene that made the cut." },
             ]}
           />
         }
       />
 
-      {/* The intro statement, laid out as its three parts rather than one paragraph. */}
+      {/* Why it matters */}
       <Section>
-        <p className="reveal font-display text-ink text-[1.3rem] md:text-[1.75rem] leading-[1.3] tracking-tight max-w-[44ch]">
-          IndiskaAI turns raw sequencing and multi-omics data into ranked, cross-validated biomarker panels.
-        </p>
-        <ol className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { k: "In", t: "Raw sequencing & multi-omics data", g: "data" as GlyphName },
-            { k: "Through", t: "Pipelines we developed in-house", g: "production" as GlyphName },
-            { k: "Out", t: "Ranked panels, with the evidence behind every call", g: "shortlist" as GlyphName },
-          ].map((s, i) => (
-            <li key={s.k} className="relative flex items-center gap-4 rounded-2xl border border-black/[0.06] bg-cream-50/70 p-5">
-              <GlyphTile name={s.g} tone="navy" />
-              <div>
-                <div className="kicker text-navy/70">{s.k}</div>
-                <div className="mt-1 text-ink text-[0.98rem] leading-snug">{s.t}</div>
-              </div>
-              {i < 2 && <span aria-hidden className="hidden md:block absolute -right-3.5 top-1/2 -translate-y-1/2 text-gold-600 text-lg">→</span>}
-            </li>
-          ))}
-        </ol>
-      </Section>
-
-      {/* What a biomarker is: many measurable sources, one signal, a decision. */}
-      <Section band="tint">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          <div className="lg:col-span-6 order-2 lg:order-1">
-            <div className="rounded-2xl border border-black/5 bg-cream-50 p-5 md:p-7">
-              <SignalDiagram />
-              <ol className="mt-6 grid grid-cols-3 gap-2 text-center" aria-label="From signal to decision">
-                {["Measurable signal", "Biological state", "Decision / stratification"].map((t, i) => (
-                  <li key={t} className={`rounded-xl px-2 py-3 text-[0.74rem] leading-tight ${i === 0 ? "bg-gold/25 text-ink" : i === 1 ? "bg-navy/10 text-ink" : "bg-ink text-cream-100"}`}>
-                    {t}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-
-          <div className="lg:col-span-6 order-1 lg:order-2">
-            <SectionHead title="What a biomarker is" />
-            <p className="-mt-4 text-ink text-[1.05rem] leading-[1.6] max-w-[48ch]">
-              Any measurable characteristic — a gene, a transcript, a protein, a metabolite, a cell population, an imaging
-              feature — that gives an objective read on biology.
-            </p>
-            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {READS.map((r) => (
-                <li key={r.q} className="rounded-xl border border-black/[0.06] bg-cream-50 p-4">
-                  <GlyphTile name={r.glyph} size="sm" tone="navy" />
-                  <div className="mt-3 text-[0.9rem] leading-snug text-ink">{r.q}</div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 border-l-2 border-gold pl-5">
-              <div className="kicker mb-1.5">The value is timing</div>
-              <p className="text-ink-soft text-[0.95rem] leading-[1.6] max-w-[52ch]">
-                A biomarker isn&apos;t the clinical outcome. It&apos;s the measurable signal that can help predict, stratify, or
-                monitor that outcome earlier, and in smaller cohorts, than waiting for the outcome itself. Used well, it can
-                improve trial design, patient stratification, and development decisions.
-              </p>
-            </div>
-          </div>
+        <SectionHead title="Every disease leaves a trace in the data" kicker="Why it matters" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          <p className="lg:col-span-7 text-ink text-[1.05rem] leading-[1.65] max-w-[58ch]">
+            Long before an outcome shows up in the clinic, cells are already behaving differently. Some genes work harder,
+            others fall silent, whole pathways shift. Captured in the right data and read carefully, that difference
+            becomes something you can measure, compare and act on. It gives you an early answer to three questions:
+          </p>
+          <ul className="lg:col-span-5 space-y-3">
+            {WHY_QUESTIONS.map((q) => (
+              <li key={q} className="flex items-center gap-3 rounded-xl border border-black/[0.06] bg-cream-50 px-5 py-4 font-display text-[1.1rem] tracking-tightest text-ink">
+                {q}
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 
-      {/* Types: a table where there's room, an accordion where there isn't. */}
+      {/* Input data -> Signal -> Processing -> Marker -> Decision */}
+      <Section band="tint">
+        <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {FUNNEL.map((f) => (
+            <li key={f.n} className="relative flex flex-col rounded-2xl border border-black/[0.06] bg-cream-50 p-5">
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[0.72rem] font-medium tabular-nums text-cream-100">{f.n}</span>
+                <GlyphTile name={f.glyph} size="sm" tone="navy" />
+              </div>
+              <div className="mt-4 font-display text-[1.05rem] tracking-tightest text-ink">{f.title}</div>
+              <p className="mt-1.5 text-ink-soft text-[0.86rem] leading-[1.45]">{f.body}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-8 border-l-2 border-gold pl-5 max-w-[70ch]">
+          <div className="kicker mb-1.5">The value is timing</div>
+          <p className="text-ink-soft text-[0.95rem] leading-[1.6]">
+            Waiting for survival outcomes takes years and large cohorts. A well-supported gene signature can point to
+            high-risk patients from samples you already have, so trial design and development decisions move sooner.
+          </p>
+        </div>
+      </Section>
+
+      {/* How we can assist your research */}
       <Section>
-        <SectionHead title="Types of biomarkers" lede="Classified by the decision they support — not only by the technology that measures them." />
+        <SectionHead
+          title="How we can assist your research"
+          kicker="For your research"
+          lede="Different research questions call for different markers. Tell us what you need to find, and we shape the analysis around your study design."
+        />
         <div className="hidden md:block overflow-hidden rounded-2xl border border-black/10">
           <table className="w-full text-left">
-            <caption className="sr-only">Biomarker types and the decision each supports</caption>
+            <caption className="sr-only">Biomarker types we support, how we assist, what the study needs, and the scope of work</caption>
             <thead className="bg-cream-200/60">
               <tr>
-                <th scope="col" className="w-[34%] px-6 py-3.5 kicker text-ink">Type</th>
-                <th scope="col" className="px-6 py-3.5 kicker text-ink">What it tells you</th>
+                <th scope="col" className="w-[16%] px-5 py-3.5 kicker text-ink">Marker you need</th>
+                <th scope="col" className="w-[34%] px-5 py-3.5 kicker text-ink">How we assist</th>
+                <th scope="col" className="w-[32%] px-5 py-3.5 kicker text-ink">What your study needs</th>
+                <th scope="col" className="px-5 py-3.5 kicker text-ink">Scope</th>
               </tr>
             </thead>
             <tbody>
-              {TYPES.map((t) => (
-                <tr key={t.type} className="border-t border-black/[0.06] bg-cream-50/60 transition-colors hover:bg-cream-50">
-                  <th scope="row" className="px-6 py-4 font-normal">
+              {ASSIST.map((a) => (
+                <tr key={a.marker} className="border-t border-black/[0.06] bg-cream-50/60 align-top transition-colors hover:bg-cream-50">
+                  <th scope="row" className="px-5 py-4 font-normal">
                     <span className="flex items-center gap-3">
-                      <GlyphTile name={t.glyph} size="sm" tone="navy" />
-                      <span className="font-display text-[1.1rem] tracking-tightest text-ink">{t.type}</span>
+                      <GlyphTile name={a.glyph} size="sm" tone="navy" />
+                      <span>
+                        <span className="block font-display text-[1.05rem] tracking-tightest text-ink">{a.marker}</span>
+                        <span className="block text-[0.78rem] text-ink-muted">{a.question}</span>
+                      </span>
                     </span>
                   </th>
-                  <td className="px-6 py-4 text-ink-soft text-[0.95rem] leading-[1.5]">{t.tells}</td>
+                  <td className="px-5 py-4 text-ink-soft text-[0.9rem] leading-[1.5]">{a.howWeAssist}</td>
+                  <td className="px-5 py-4 text-ink-soft text-[0.9rem] leading-[1.5]">{a.studyNeeds}</td>
+                  <td className="px-5 py-4">
+                    <span className={`inline-flex rounded-full px-3 py-1 text-[0.74rem] font-medium ${a.scope === "Full pipeline" ? "bg-gold/20 text-ink" : "bg-navy/10 text-navy"}`}>
+                      {a.scope}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <div className="md:hidden border-t border-black/10">
-          {TYPES.map((t) => (
-            <details key={t.type} className="group border-b border-black/10">
+          {ASSIST.map((a) => (
+            <details key={a.marker} className="group border-b border-black/10">
               <summary className="flex cursor-pointer list-none items-center gap-3 py-4 [&::-webkit-details-marker]:hidden">
-                <GlyphTile name={t.glyph} size="sm" tone="navy" />
-                <span className="flex-1 font-display text-[1.08rem] tracking-tightest text-ink">{t.type}</span>
+                <GlyphTile name={a.glyph} size="sm" tone="navy" />
+                <span className="flex-1">
+                  <span className="block font-display text-[1.05rem] tracking-tightest text-ink">{a.marker}</span>
+                  <span className="block text-[0.78rem] text-ink-muted">{a.question}</span>
+                </span>
                 <span aria-hidden className="text-navy text-xl leading-none transition-transform duration-300 group-open:rotate-45">+</span>
               </summary>
-              <p className="pb-4 pl-[3.25rem] text-ink-soft text-[0.92rem] leading-[1.55]">{t.tells}</p>
+              <div className="pb-4 pl-[3.25rem] space-y-2">
+                <p className="text-ink-soft text-[0.9rem] leading-[1.5]">{a.howWeAssist}</p>
+                <p className="text-ink-muted text-[0.82rem] leading-[1.5]">Needs: {a.studyNeeds}</p>
+                <span className={`inline-flex rounded-full px-3 py-1 text-[0.74rem] font-medium ${a.scope === "Full pipeline" ? "bg-gold/20 text-ink" : "bg-navy/10 text-navy"}`}>
+                  {a.scope}
+                </span>
+              </div>
             </details>
           ))}
         </div>
-      </Section>
-
-      {/* Modalities */}
-      <Section band="tint">
-        <SectionHead title="Measured across modalities" lede="The same categories can be investigated through very different data types." />
-        <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          {MODALITIES.map((m) => (
-            <li key={m.name} className="rounded-2xl border border-black/[0.06] bg-cream-50 p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-navy/20">
-              <GlyphTile name={m.glyph} tone="navy" />
-              <div className="mt-4 text-[0.66rem] tracking-[0.12em] uppercase text-navy">{m.name}</div>
-              <div className="mt-1 text-[0.86rem] leading-snug text-ink">{m.sub}</div>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-8 font-display text-[1.15rem] md:text-[1.3rem] leading-snug tracking-tight text-ink max-w-[50ch]">
-          Choosing the right modality for the biological question is a central part of biomarker programme design.
+        <p className="mt-6 text-ink-soft text-[0.9rem]">
+          New to biomarker types? Read our guide to biomarker types on the{" "}
+          <Link href="/research" className="text-navy underline underline-offset-2 hover:text-ink">Research page</Link>.
         </p>
       </Section>
 
-      {/* What we provide — two substantial capability cards. */}
-      <Section>
-        <SectionHead title="What we provide" kicker="Developed and operated in-house" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {PIPELINES.map((p, idx) => (
-            <article key={p.title} className="relative overflow-hidden rounded-3xl border border-black/[0.08] bg-cream-50 p-6 md:p-9 shadow-[0_24px_60px_-44px_rgba(16,53,101,0.45)]">
-              <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${idx === 0 ? "bg-navy" : "bg-gold"}`} />
-              <div className="kicker text-navy/70">0{idx + 1}</div>
-              <h3 className="mt-2 font-display text-[clamp(1.5rem,3vw,2.1rem)] leading-[1.05] tracking-tightest text-ink">{p.title}</h3>
-              <p className="mt-3 text-ink-soft text-[0.98rem] leading-[1.55] max-w-[46ch]">{p.lede}</p>
-
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-8">
-                <div aria-label={`${p.title} stages`}>
-                  <VisualPipeline steps={p.steps} vertical />
-                </div>
-                <ul className="space-y-3.5 md:border-l md:border-black/[0.06] md:pl-8">
-                  {p.capabilities.map((c) => (
-                    <li key={c} className="flex gap-3 text-[0.92rem] leading-[1.5] text-ink">
-                      <Check />
-                      {c}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </article>
+      {/* What we provide */}
+      <Section band="tint">
+        <SectionHead title="What we provide" kicker="Developed and operated in-house" lede="Take the complete biomarker discovery service, or start from whichever stage your data is at." />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <PackageCard p={END_TO_END} featured />
+          {STAGE_PACKAGES.map((p) => (
+            <PackageCard key={p.title} p={p} />
           ))}
         </div>
       </Section>
 
-      {/* Evidence: how a signature is stress-tested. */}
+      {/* How we discover biomarkers: eight steps, three stages */}
+      <Section>
+        <SectionHead
+          title="How we discover biomarkers"
+          kicker="Our platform"
+          lede="Every project runs through our biomarker discovery pipeline. An RNA-seq pipeline sits inside it, preparing your data before expression analysis and survival modelling begin."
+        />
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="rounded-full bg-ink px-4 py-2 text-[0.82rem] font-medium text-cream-100">RNA sequencing reads</span>
+          <span className="rounded-full border border-navy/20 bg-navy/[0.05] px-4 py-2 text-[0.82rem] font-medium text-navy">Clinical survival data</span>
+          <span aria-hidden className="h-px flex-1 bg-navy/20" />
+          <span className="text-[0.72rem] tracking-[0.14em] uppercase text-ink-muted">Eight steps, three stages</span>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+          <StageColumn title="Stage 1 — inside the platform · RNA-seq pipeline" steps={STAGE_1} tint="navy" />
+          <StageColumn title="Stage 2 · Expression analysis" steps={STAGE_2} tint="navy" />
+          <StageColumn title="Stage 3 · Biomarker modelling" steps={STAGE_3} tint="gold" />
+        </div>
+
+        <div className="mt-5 flex items-center gap-3">
+          <span aria-hidden className="h-px flex-1 bg-navy/20" />
+          <span className="rounded-full bg-gold px-4 py-2 text-[0.82rem] font-medium text-ink">Prognostic gene signature</span>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-[0.9rem] leading-[1.5] text-ink-soft">
+          <p><span className="font-medium text-ink">RNA-seq pipeline —</span> raw reads are checked, mapped and counted into a clean gene expression matrix.</p>
+          <p><span className="font-medium text-ink">Expression analysis —</span> genes that differ between groups are found and placed in their biological context.</p>
+          <p><span className="font-medium text-ink">Biomarker modelling —</span> those genes are tested against survival and narrowed to a small, independent signature.</p>
+        </div>
+      </Section>
+
+      {/* Sample outputs: volcano plot + expression heatmap */}
       <Section band="tint">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          <div className="lg:col-span-5">
-            <SectionHead title="Stress-tested before it's reported" kicker="Evidence & validation" />
-            <ul className="-mt-2 space-y-4">
-              {EVIDENCE.map((e) => (
-                <li key={e.title} className="flex gap-4">
-                  <GlyphTile name={e.glyph} size="sm" tone="navy" />
-                  <div>
-                    <div className="font-display text-[1.1rem] tracking-tightest text-ink">{e.title}</div>
-                    <p className="mt-0.5 text-ink-soft text-[0.9rem] leading-[1.5]">{e.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <figure className="lg:col-span-7">
-            <ScienceFigure
-              name="validationFolds"
-              description="Five cross-validation folds, each holding out a different part of the discovery cohort, beside a separate independent cohort"
-              className="p-6 md:p-10"
-            />
-            <figcaption className="mt-2.5 text-[0.72rem] text-ink-muted">
-              Each row holds out a different fold (gold); the separate block is an independent cohort. Schematic.
+        <SectionHead title="Results you can see, not just read" kicker="Sample outputs" lede="Every expression analysis comes with clear figures, so you can see what changed and where to look next." />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <figure className="rounded-2xl border border-black/[0.07] bg-cream-50 p-6">
+            <VolcanoPlot />
+            <figcaption className="mt-4">
+              <div className="font-display text-[1.05rem] tracking-tightest text-ink">Volcano plot</div>
+              <p className="mt-1 text-ink-soft text-[0.86rem] leading-[1.5]">
+                Every gene in one view: how much it changes between groups, and how strong the evidence is. The strongest
+                genes are labelled.
+              </p>
+            </figcaption>
+          </figure>
+          <figure className="rounded-2xl border border-black/[0.07] bg-cream-50 p-6">
+            <ExpressionHeatmap />
+            <figcaption className="mt-4">
+              <div className="font-display text-[1.05rem] tracking-tightest text-ink">Expression heatmap</div>
+              <p className="mt-1 text-ink-soft text-[0.86rem] leading-[1.5]">
+                The top changing genes across every sample, showing how consistently each group behaves.
+              </p>
             </figcaption>
           </figure>
         </div>
-        <div className="mt-12 flex items-start gap-4 rounded-2xl border border-gold/40 bg-gold/5 p-6 max-w-[80ch]">
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+          {READING_GUIDE.map((r) => (
+            <div key={r.label} className="rounded-xl border border-black/[0.06] bg-cream-50 p-4">
+              <div className="text-[0.78rem] font-medium tracking-[0.04em] uppercase text-navy">{r.label}</div>
+              <p className="mt-1.5 text-ink-soft text-[0.88rem] leading-[1.5]">{r.body}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-[0.78rem] text-ink-muted">Figures shown use simulated data for illustration. They are not results from any client project.</p>
+      </Section>
+
+      {/* Evidence */}
+      <Section>
+        <SectionHead title="Built to hold up" kicker="Evidence" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {EVIDENCE.map((e) => (
+            <div key={e.title} className="rounded-2xl border border-black/[0.06] bg-cream-50 p-6">
+              <GlyphTile name={e.glyph} size="sm" tone="navy" />
+              <div className="mt-4 font-display text-[1.1rem] tracking-tightest text-ink">{e.title}</div>
+              <p className="mt-1.5 text-ink-soft text-[0.9rem] leading-[1.5]">{e.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 flex items-start gap-4 rounded-2xl border border-gold/40 bg-gold/5 p-6 max-w-[80ch]">
           <GlyphTile name="validate" size="sm" />
           <div>
             <div className="kicker mb-2 text-ink">Scope &amp; limitations</div>
@@ -448,156 +464,61 @@ export default function BiomarkerPage() {
         </div>
       </Section>
 
-      {/* AI-assisted drug-discovery analysis — a separate track that biomarker evidence can feed. */}
-      <Section id="drug-discovery">
-        <div className="mb-10 md:mb-14 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-          <div className="lg:col-span-7">
-            <div className="kicker mb-3">AI-assisted drug-discovery analysis</div>
-            <h2 className="font-display text-[clamp(1.7rem,4vw,2.8rem)] leading-[1.02] tracking-tightest text-ink max-w-[20ch]">
-              From biological evidence to prioritised candidates
-            </h2>
-          </div>
-          <p className="lg:col-span-5 text-ink-soft text-[0.95rem] leading-[1.55]">
-            Biomarkers describe a disease state. When a programme moves toward therapeutics, the same evidence can inform
-            target hypotheses — and a structure-guided workflow then prioritises candidate molecules.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="rounded-full bg-ink px-4 py-2 text-[0.82rem] font-medium text-cream-100">Biological data</span>
-          <span aria-hidden className="h-px flex-1 bg-navy/20" />
-        </div>
-
-        <ol className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-          {STAGES.map((s, i) => (
-            <li key={s.title} className="flex flex-col rounded-2xl border border-black/[0.07] bg-cream-50 p-5 md:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-navy px-2 text-[0.74rem] font-medium tabular-nums text-cream-100">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="rounded-full border border-navy/15 bg-navy/[0.05] px-2.5 py-1 text-[0.7rem] tracking-[0.04em] text-navy">{s.method}</span>
-              </div>
-              <ScienceFigure name={s.art} description="" className="mt-4 h-36 bg-cream-100" />
-              <h3 className="mt-4 font-display text-[1.22rem] leading-tight tracking-tightest text-ink">{s.title}</h3>
-              <p className="mt-1.5 text-ink-soft text-[0.9rem] leading-[1.5]">{s.body}</p>
-              {s.chain && (
-                <div aria-hidden className="mt-3 flex flex-wrap items-center gap-1 text-[0.72rem] tracking-[0.04em] uppercase text-navy">
-                  {s.chain.map((c, j) => (
-                    <span key={c} className="flex items-center gap-1">
-                      <span className="rounded-full bg-navy/[0.07] px-2 py-0.5">{c}</span>
-                      {j < s.chain!.length - 1 && <span className="text-gold-600">→</span>}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {s.caption && <p className="mt-3 text-[0.76rem] text-ink-muted">{s.caption}</p>}
-              {s.link && (
-                <Link href={s.link.href} className="mt-auto pt-4 inline-flex items-center gap-1.5 text-[0.85rem] font-medium text-navy hover:text-ink">
-                  See {s.link.label}
-                  <span aria-hidden>→</span>
-                </Link>
-              )}
-            </li>
-          ))}
-        </ol>
-
-        <div className="mt-5 flex items-center gap-3">
-          <span aria-hidden className="h-px flex-1 bg-navy/20" />
-          <span className="rounded-full bg-gold px-4 py-2 text-[0.82rem] font-medium text-ink">Candidate prioritisation</span>
-        </div>
-
-        <details className="group mt-10 rounded-2xl border border-black/10 bg-cream-50/60">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-ink [&::-webkit-details-marker]:hidden">
-            <span className="font-display text-[1.1rem] tracking-tightest">How these terms differ</span>
-            <span aria-hidden className="text-navy text-xl leading-none transition-transform duration-300 group-open:rotate-45">+</span>
-          </summary>
-          <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 px-5 pb-5">
-            {TERMS.map((t) => (
-              <div key={t.term} className="border-t border-black/[0.06] pt-3">
-                <dt className="text-[0.9rem] font-medium text-ink">{t.term}</dt>
-                <dd className="mt-0.5 text-[0.86rem] text-ink-soft">{t.def}</dd>
-              </div>
-            ))}
-          </dl>
-        </details>
-      </Section>
-
-      {/* Decision: what the workflow hands over — a ranked shortlist with its evidence. */}
-      <Section band="navy">
-        <div className="mb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-          <div className="lg:col-span-7">
-            <div className="text-[0.72rem] tracking-[0.18em] uppercase text-gold mb-3">Illustrative example</div>
-            <h2 className="font-display text-[clamp(1.7rem,4vw,2.8rem)] leading-[1.02] tracking-tightest">Candidate prioritisation</h2>
-          </div>
-          <p className="lg:col-span-5 text-cream-100/75 text-[0.95rem] leading-[1.55]">
-            The output is a comparative ranking and the evidence behind it — a basis for choosing what to test experimentally.
-          </p>
-        </div>
-
-        <div className="hidden md:block overflow-hidden rounded-2xl border border-cream-100/10">
-          <table className="w-full text-left">
-            <caption className="sr-only">Illustrative comparison of three candidates across five computational criteria, with a comparative rank</caption>
-            <thead className="bg-cream-100/[0.06]">
-              <tr>
-                <th scope="col" className="px-5 py-3.5 text-[0.7rem] tracking-[0.12em] uppercase text-cream-100/60 font-medium">Candidate</th>
-                {CRITERIA.map((c) => (
-                  <th key={c} scope="col" className="px-4 py-3.5 text-[0.7rem] tracking-[0.1em] uppercase text-cream-100/60 font-medium">{c}</th>
-                ))}
-                <th scope="col" className="px-5 py-3.5 text-[0.7rem] tracking-[0.12em] uppercase text-gold font-medium">Comparative rank</th>
-              </tr>
-            </thead>
-            <tbody>
-              {CANDIDATES.map((c) => (
-                <tr key={c.name} className="border-t border-cream-100/10">
-                  <th scope="row" className="px-5 py-4 font-display text-[1.05rem] font-normal tracking-tightest">{c.name}</th>
-                  {c.scores.map((s, i) => (
-                    <td key={CRITERIA[i]} className="px-4 py-4">
-                      <Dots n={s} />
-                      <span className="sr-only">{LEVEL[s]}</span>
-                    </td>
-                  ))}
-                  <td className="px-5 py-4">
-                    <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-[0.85rem] font-medium ${c.rank === 1 ? "bg-gold text-ink" : "bg-cream-100/10 text-cream-100"}`}>
-                      {c.rank}
-                    </span>
-                  </td>
+      {/* Getting started */}
+      <Section band="tint">
+        <SectionHead title="How to work with us" kicker="Getting started" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 hidden md:block overflow-hidden rounded-2xl border border-black/10">
+            <table className="w-full text-left">
+              <caption className="sr-only">Ways to work with us, what you provide, and which service stages are included</caption>
+              <thead className="bg-cream-200/60">
+                <tr>
+                  <th scope="col" className="px-5 py-3.5 kicker text-ink">Option</th>
+                  <th scope="col" className="px-5 py-3.5 kicker text-ink">You provide</th>
+                  <th scope="col" className="px-5 py-3.5 kicker text-ink">Services</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <ul className="md:hidden space-y-3">
-          {CANDIDATES.map((c) => (
-            <li key={c.name} className="rounded-2xl border border-cream-100/10 p-4">
-              <div className="flex items-center justify-between">
-                <span className="font-display text-[1.1rem] tracking-tightest">{c.name}</span>
-                <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-[0.85rem] font-medium ${c.rank === 1 ? "bg-gold text-ink" : "bg-cream-100/10"}`}>
-                  <span className="sr-only">Rank </span>{c.rank}
-                </span>
-              </div>
-              <dl className="mt-3 space-y-2">
-                {CRITERIA.map((cr, i) => (
-                  <div key={cr} className="flex items-center justify-between gap-3 text-[0.85rem]">
-                    <dt className="text-cream-100/75">{cr}</dt>
-                    <dd className="flex items-center gap-2"><Dots n={c.scores[i]} /><span className="sr-only">{LEVEL[c.scores[i]]}</span></dd>
-                  </div>
+              </thead>
+              <tbody>
+                {WORK_OPTIONS.map((o) => (
+                  <tr key={o.option} className="border-t border-black/[0.06] bg-cream-50/60 transition-colors hover:bg-cream-50">
+                    <th scope="row" className="px-5 py-4 font-display text-[1rem] font-normal tracking-tightest text-ink">{o.option}</th>
+                    <td className="px-5 py-4 text-ink-soft text-[0.9rem] leading-[1.5]">{o.provide}</td>
+                    <td className="px-5 py-4 text-ink-soft text-[0.9rem] leading-[1.5]">{o.services}</td>
+                  </tr>
                 ))}
-              </dl>
-            </li>
-          ))}
-        </ul>
+              </tbody>
+            </table>
+          </div>
+          <ul className="lg:col-span-8 md:hidden space-y-3">
+            {WORK_OPTIONS.map((o) => (
+              <li key={o.option} className="rounded-2xl border border-black/[0.07] bg-cream-50 p-4">
+                <div className="font-display text-[1.05rem] tracking-tightest text-ink">{o.option}</div>
+                <dl className="mt-2 space-y-1 text-[0.86rem]">
+                  <div className="flex gap-2"><dt className="text-ink-muted">You provide:</dt><dd className="text-ink-soft">{o.provide}</dd></div>
+                  <div className="flex gap-2"><dt className="text-ink-muted">Services:</dt><dd className="text-ink-soft">{o.services}</dd></div>
+                </dl>
+              </li>
+            ))}
+          </ul>
 
-        <p className="mt-6 text-[0.78rem] leading-[1.5] text-cream-100/60 max-w-[74ch]">
-          Illustrative — not results from any project. Rankings rest on computational evidence (predicted scores, simulated
-          behaviour); they are not measured affinities and do not predict efficacy.
-        </p>
+          <div className="lg:col-span-4 rounded-2xl border border-black/[0.06] bg-cream-50 p-6">
+            <div className="kicker mb-3 text-ink">What we need from you</div>
+            <ul className="space-y-3">
+              {WHAT_WE_NEED.map((w) => (
+                <li key={w} className="flex gap-3 text-[0.88rem] leading-[1.5] text-ink">
+                  <Check />
+                  {w}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </Section>
 
       <ServiceCTA
         service={service}
         title="Have a biomarker question?"
-        lede="Turn sequencing and multi-omics data into prioritised biomarker signatures with the evidence needed for downstream evaluation."
+        lede="Tell us about your study and data, and we'll suggest where to start."
         ctaLabel="Partner with us"
         background="biomarkerNetwork"
       />

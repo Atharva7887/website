@@ -572,8 +572,8 @@ export const SERVICES: ServiceEntry[] = [
     custom: true,
     art: "biomarkerNetwork",
     artDescription: "Correlation network of molecular features with a prioritised sub-cluster highlighted",
-    summary: "Sequencing data in. Defensible biomarker signatures out.",
-    description: "Ranked, cross-validated biomarker panels from sequencing and multi-omics data.",
+    summary: "RNA sequencing data in. Survival-linked gene signatures out.",
+    description: "A compact, cross-validated gene signature from raw RNA-seq reads and patient survival data.",
     ctaLabel: "Partner with us",
   },
   {
