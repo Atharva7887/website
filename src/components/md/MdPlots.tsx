@@ -6,7 +6,7 @@
  * chart, grouped bars, a scrolling contact raster and a PCA scatter.
  *
  * The curves are seeded shapes with gentle live noise — they show what each
- * analysis looks like, never a result. The three series are neutral example
+ * analysis looks like, never a result. The four series are neutral example
  * candidates; nothing here implies one method or candidate is better.
  */
 import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode, type RefObject } from "react";
@@ -14,12 +14,13 @@ import { useReducedMotion } from "framer-motion";
 
 export type MdPlotKey = "rmsd" | "rmsf" | "rg" | "sasa" | "hbonds" | "contacts" | "pca" | "mmpbsa";
 
-type Key = "a" | "b" | "c";
+type Key = "a" | "b" | "c" | "d";
 type Series = { key: Key; name: string; color: string; dash?: string };
 const SERIES: Series[] = [
   { key: "a", name: "Candidate A", color: "#1E5BA8" },
   { key: "b", name: "Candidate B", color: "#D9A91A", dash: "6 4" },
   { key: "c", name: "Candidate C", color: "#6B6B6B" },
+  { key: "d", name: "Candidate D", color: "#12876F", dash: "1 4" },
 ];
 
 const GRID = "rgba(26,26,26,0.07)";
@@ -410,6 +411,7 @@ const RMSD: LineCfg = {
     a: { f: rise(0.3, 2.42, 7, (x) => 0.2 / (1 + Math.exp(-(x - 58) / 3))), env: envRise(7), noise: 0.075, sd: 0.2, drift: 0.05, dph: 0 },
     b: { f: rise(0.3, 2.05, 6), env: envRise(6), noise: 0.065, sd: 0.16, drift: 0.04, dph: 1.7 },
     c: { f: rise(0.3, 1.55, 5), env: envRise(5), noise: 0.05, sd: 0.11, drift: 0.03, dph: 3.1 },
+    d: { f: rise(0.3, 1.78, 5.5), env: envRise(5.5), noise: 0.055, sd: 0.13, drift: 0.035, dph: 4.4 },
   },
 };
 const RG: LineCfg = {
@@ -418,6 +420,7 @@ const RG: LineCfg = {
     a: { f: settle(1.905, 1.955, 12, 0.012), env: envFrom(0.6, 8), noise: 0.0065, sd: 0.014, drift: 0.004, dph: 0 },
     b: { f: settle(1.905, 1.925, 10), env: envFrom(0.6, 8), noise: 0.0055, sd: 0.011, drift: 0.003, dph: 1.4 },
     c: { f: settle(1.9, 1.872, 8), env: envFrom(0.6, 8), noise: 0.0045, sd: 0.008, drift: 0.0025, dph: 2.6 },
+    d: { f: settle(1.9, 1.888, 9), env: envFrom(0.6, 8), noise: 0.005, sd: 0.009, drift: 0.003, dph: 3.9 },
   },
 };
 const SASA: LineCfg = {
@@ -426,6 +429,7 @@ const SASA: LineCfg = {
     a: { f: decay(112.5, 106.2, 45), env: envFrom(0.7, 10), noise: 0.55, sd: 1.1, drift: 0.35, dph: 0 },
     b: { f: decay(110.8, 104.1, 40), env: envFrom(0.7, 10), noise: 0.5, sd: 0.95, drift: 0.3, dph: 1.3 },
     c: { f: decay(107.5, 99.2, 35), env: envFrom(0.7, 10), noise: 0.42, sd: 0.75, drift: 0.25, dph: 2.4 },
+    d: { f: decay(109.0, 101.6, 38), env: envFrom(0.7, 10), noise: 0.46, sd: 0.85, drift: 0.28, dph: 3.6 },
   },
 };
 const RMSF: BarCfg = {
@@ -436,23 +440,24 @@ const RMSF: BarCfg = {
     a: [1.05, 0.72, 1.32, 1.58, 1.46, 1.62, 1.2, 0.48, 0.92, 1.3, 1.48, 0.88, 0.62, 2.35, 2.98, 2.62, 1.72, 0.64],
     b: [0.98, 0.68, 1.18, 1.4, 1.3, 1.44, 1.08, 0.46, 0.86, 1.18, 1.32, 0.8, 0.58, 1.95, 2.44, 2.18, 1.46, 0.6],
     c: [0.92, 0.62, 0.98, 1.12, 1.06, 1.18, 0.9, 0.42, 0.76, 0.98, 1.08, 0.7, 0.54, 1.28, 1.62, 1.44, 1.02, 0.55],
+    d: [0.95, 0.66, 1.06, 1.24, 1.16, 1.3, 0.98, 0.44, 0.8, 1.08, 1.2, 0.76, 0.56, 1.52, 1.94, 1.72, 1.2, 0.57],
   },
 };
 const HBONDS: BarCfg = {
   cats: ["Y32 OH · E45 OE1", "R58 NH2 · D72 OD2", "Y101 OH · K49 NZ", "S31 OG · N47 OD1", "D99 OD1 · R22 NH1"],
   shortCats: ["Y32–E45", "R58–D72", "Y101–K49", "S31–N47", "D99–R22"],
   horizontal: true, v0: 0, v1: 100, ticks: [0, 20, 40, 60, 80, 100], fmt: (v) => `${v}%`, xLabel: "Occupancy (% of frames)", margin: { r: 18 }, wobble: 0.025,
-  values: { a: [82, 71, 44, 26, 12], b: [86, 76, 55, 33, 18], c: [94, 88, 78, 58, 41] },
+  values: { a: [82, 71, 44, 26, 12], b: [86, 76, 55, 33, 18], c: [94, 88, 78, 58, 41], d: [91, 84, 68, 47, 30] },
 };
 const MMPBSA: BarCfg = {
   cats: ["Y32", "W50", "Y52", "R58", "D99", "Y101", "F102"],
   v0: -6, v1: 1.5, base: 0, ticks: [-6, -4.5, -3, -1.5, 0, 1.5], fmt: (v) => fx(v, 1), xLabel: "Residue (per-residue decomposition)", yLabel: "ΔG (kcal/mol)", wobble: 0.03,
-  values: { a: [-3.4, -2.8, -1.9, -1.2, 0.7, -0.6, -2.1], b: [-3.7, -3.0, -2.1, -1.5, 0.4, -0.9, -2.3], c: [-4.9, -3.6, -2.7, -2.4, -0.5, -1.8, -2.9] },
-  err: { a: [0.5, 0.45, 0.4, 0.35, 0.3, 0.3, 0.4], b: [0.45, 0.4, 0.35, 0.3, 0.28, 0.3, 0.35], c: [0.35, 0.3, 0.3, 0.28, 0.22, 0.25, 0.3] },
+  values: { a: [-3.4, -2.8, -1.9, -1.2, 0.7, -0.6, -2.1], b: [-3.7, -3.0, -2.1, -1.5, 0.4, -0.9, -2.3], c: [-4.9, -3.6, -2.7, -2.4, -0.5, -1.8, -2.9], d: [-4.4, -3.3, -2.4, -2.0, -0.2, -1.4, -2.6] },
+  err: { a: [0.5, 0.45, 0.4, 0.35, 0.3, 0.3, 0.4], b: [0.45, 0.4, 0.35, 0.3, 0.28, 0.3, 0.35], c: [0.35, 0.3, 0.3, 0.28, 0.22, 0.25, 0.3], d: [0.4, 0.35, 0.3, 0.3, 0.25, 0.28, 0.32] },
 };
 const CONTACTS: RasterCfg = {
   rows: ["Y32", "R58", "Y101", "D99", "S31"],
-  p: { a: [0.86, 0.72, 0.44, 0.3, 0.18], b: [0.9, 0.78, 0.55, 0.38, 0.24], c: [0.97, 0.92, 0.8, 0.64, 0.48] },
+  p: { a: [0.86, 0.72, 0.44, 0.3, 0.18], b: [0.9, 0.78, 0.55, 0.38, 0.24], c: [0.97, 0.92, 0.8, 0.64, 0.48], d: [0.94, 0.87, 0.68, 0.52, 0.36] },
 };
 const PCA: ScatterCfg = {
   x0: -6, x1: 6, y0: -4, y1: 4, xTicks: [-6, -4, -2, 0, 2, 4, 6], yTicks: [-4, -2, 0, 2, 4], jit: 0.09, xLabel: "PC1 (38.4% variance, nm)", yLabel: "PC2 (16.9%, nm)",
@@ -460,6 +465,7 @@ const PCA: ScatterCfg = {
     a: [{ x: -2.6, y: -1.2, sx: 1.05, sy: 0.75, rho: 0.25, n: 46 }, { x: 3.0, y: 1.5, sx: 0.9, sy: 0.7, n: 30 }, { x: 0.3, y: 0.1, sx: 0.9, sy: 0.5, rho: 0.4, n: 8 }],
     b: [{ x: -2.0, y: -0.7, sx: 0.85, sy: 0.65, rho: 0.2, n: 52 }, { x: 2.1, y: 1.3, sx: 0.6, sy: 0.5, n: 16 }],
     c: [{ x: -1.1, y: 0.9, sx: 0.45, sy: 0.38, rho: 0.1, n: 62 }],
+    d: [{ x: -0.5, y: -0.2, sx: 0.55, sy: 0.45, rho: 0.15, n: 54 }, { x: 0.8, y: 0.9, sx: 0.35, sy: 0.3, n: 10 }],
   },
 };
 
@@ -469,32 +475,32 @@ type PlotDef = { swatch: Swatch; foot: string; alt: string; render: (W: number, 
 export const MD_PLOTS: Record<MdPlotKey, PlotDef> = {
   rmsd: {
     swatch: "line", foot: "Backbone Cα · mean ± SD across replicas (shaded)",
-    alt: "RMSD against simulated time for three example candidates; each rises during equilibration, then fluctuates around a plateau.",
+    alt: "RMSD against simulated time for four example candidates; each rises during equilibration, then fluctuates around a plateau.",
     render: (W, H) => <LineChart o={RMSD} W={W} H={H} />,
   },
   rmsf: {
     swatch: "box", foot: "Cα RMSF per residue · loop regions shaded",
-    alt: "Per-residue RMSF bars for three example candidates; the shaded loop regions fluctuate more than the rest of the chain.",
+    alt: "Per-residue RMSF bars for four example candidates; the shaded loop regions fluctuate more than the rest of the chain.",
     render: (W, H) => <BarChart o={RMSF} W={W} H={H} />,
   },
   rg: {
     swatch: "line", foot: "Protein heavy atoms · mean ± SD across replicas (shaded)",
-    alt: "Radius of gyration against simulated time for three example candidates, each settling to a steady compactness.",
+    alt: "Radius of gyration against simulated time for four example candidates, each settling to a steady compactness.",
     render: (W, H) => <LineChart o={RG} W={W} H={H} />,
   },
   sasa: {
     swatch: "line", foot: "Total SASA · mean ± SD across replicas (shaded)",
-    alt: "Solvent-accessible surface area against simulated time for three example candidates, drifting slowly as the systems relax.",
+    alt: "Solvent-accessible surface area against simulated time for four example candidates, drifting slowly as the systems relax.",
     render: (W, H) => <LineChart o={SASA} W={W} H={H} />,
   },
   hbonds: {
     swatch: "box", foot: "Donor–acceptor ≤ 3.5 Å, angle ≥ 150° · share of frames",
-    alt: "Horizontal bars of hydrogen-bond occupancy for five example donor–acceptor pairs across three example candidates.",
+    alt: "Horizontal bars of hydrogen-bond occupancy for five example donor–acceptor pairs across four example candidates.",
     render: (W, H) => <BarChart o={HBONDS} W={W} H={H} />,
   },
   contacts: {
     swatch: "box", foot: "Contact = heavy atom within 4.5 Å · % = occupancy in the visible window",
-    alt: "A scrolling timeline of residue contacts for three example candidates; filled cells mark frames where a contact is present.",
+    alt: "A scrolling timeline of residue contacts for four example candidates; filled cells mark frames where a contact is present.",
     render: (W, H) => <Raster o={CONTACTS} W={W} H={H} />,
   },
   pca: {
@@ -504,7 +510,7 @@ export const MD_PLOTS: Record<MdPlotKey, PlotDef> = {
   },
   mmpbsa: {
     swatch: "box", foot: "Per-residue energy decomposition · error bars = SD",
-    alt: "Per-residue energy contributions for three example candidates; bars below zero are favourable contributions.",
+    alt: "Per-residue energy contributions for four example candidates; bars below zero are favourable contributions.",
     render: (W, H) => <BarChart o={MMPBSA} W={W} H={H} />,
   },
 };
