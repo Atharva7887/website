@@ -16,7 +16,7 @@ import { getService } from "@/lib/services-data";
 
 export const metadata: Metadata = {
   title: "Whole Exome Sequencing Analysis",
-  description: "Bioinformatics analysis of exome sequencing data — from raw FASTQ files to an annotated, classified variant report.",
+  description: "Bioinformatics analysis of exome sequencing data, from raw FASTQ files to an annotated, classified variant report.",
 };
 
 const COVERS: { title: string; glyph: GlyphName }[] = [
@@ -106,7 +106,7 @@ function WesReportMock() {
         </table>
       </div>
       <figcaption className="border-t border-black/5 px-5 py-3 text-[0.72rem] text-ink-muted">
-        Example report layout with placeholder entries — not patient data or a real result.
+        Example report layout with placeholder entries, not patient data or a real result.
       </figcaption>
     </figure>
   );
@@ -115,21 +115,21 @@ function WesReportMock() {
 type Faq = { q: string; a: React.ReactNode; pending?: boolean };
 
 const FAQS: Faq[] = [
-  { q: "What data do I need to provide?", a: "Raw FASTQ files are preferred. Aligned BAM/CRAM or a VCF can also be accepted, together with the capture kit or target regions and a short phenotype or research question — without patient identifiers." },
+  { q: "What data do I need to provide?", a: "Raw FASTQ files are preferred. Aligned BAM/CRAM or a VCF can also be accepted, together with the capture kit or target regions and a short phenotype or research question, without patient identifiers." },
   { q: "Which sequencing platforms and capture kits do you support?", a: "Whole-exome data from standard short-read next-generation sequencing workflows and different capture designs, subject to data quality and project requirements. Tell us the platform and kit when you enquire." },
   { q: "Can you analyse data that was sequenced some time ago?", a: "Usually, yes. Older data is re-checked for quality and coverage first, and we'll tell you if anything limits what it can support." },
-  { q: "Can you review an exome that has already been analysed elsewhere?", a: "Yes — reanalysis from raw or aligned data is possible, and annotation databases change over time. Supplying the earlier report helps us scope it." },
+  { q: "Can you review an exome that has already been analysed elsewhere?", a: "Yes, reanalysis from raw or aligned data is possible, and annotation databases change over time. Supplying the earlier report helps us scope it." },
   { q: "What will I receive?", a: "A QC summary, annotated and classified variant calls, a prioritised variant list, inheritance analysis for duo and trio requests, and an interpreted report with the evidence behind each prioritised variant." },
   {
     q: "How long does the analysis take?",
     pending: true,
-    a: <PendingContent topic="Turnaround">Draft: Singleton — 10 working days. Duo / Trio — 14 working days. Urgent analysis available by prior arrangement. Publish only once confirmed as a commitment.</PendingContent>,
+    a: <PendingContent topic="Turnaround">Draft: Singleton, 10 working days. Duo / Trio, 14 working days. Urgent analysis available by prior arrangement. Publish only once confirmed as a commitment.</PendingContent>,
   },
   { q: "What happens if no causative variant is identified?", a: "The report says so plainly and records the coverage and any limitations of the data. Reanalysis can be discussed later, as databases and knowledge change." },
   {
     q: "How is my data protected?",
     pending: true,
-    a: <PendingContent topic="Data protection">Draft covers: encrypted transfer and storage, analyst-only access, a data protection agreement, coded (de-identified) data, and agreed retention / deletion terms. Needs confirmation against the actual privacy policy and contracts — no regulatory standard should be named until verified.</PendingContent>,
+    a: <PendingContent topic="Data protection">Draft covers: encrypted transfer and storage, analyst-only access, a data protection agreement, coded (de-identified) data, and agreed retention / deletion terms. Needs confirmation against the actual privacy policy and contracts; no regulatory standard should be named until verified.</PendingContent>,
   },
   {
     q: "Who owns the results?",
@@ -150,7 +150,7 @@ export default function WesPage() {
         crumbs={[{ label: "Services", href: "/services" }, { label: "Genomics" }, { label: "Whole Exome Sequencing" }]}
         eyebrow="Genomics"
         title="Whole Exome Sequencing Analysis"
-        lede="Bioinformatics analysis of exome sequencing data — from raw FASTQ files to an annotated, classified variant report."
+        lede="Bioinformatics analysis of exome sequencing data, from raw FASTQ files to an annotated, classified variant report."
         cta={
           <>
             <a href="#request" className="cta">
@@ -212,7 +212,7 @@ export default function WesPage() {
           </div>
           <div className="lg:col-span-7 space-y-3">
             <p className="text-ink-soft text-[1rem] leading-[1.6] max-w-[60ch]">
-              Complete analysis of whole exome sequencing data — raw FASTQ through to an annotated, classified variant report.
+              Complete analysis of whole exome sequencing data, raw FASTQ through to an annotated, classified variant report.
               We work with exome data from standard next-generation sequencing workflows and different capture designs,
               subject to data quality and project requirements.
             </p>
@@ -262,7 +262,7 @@ export default function WesPage() {
 
       {/* Applications */}
       <Section>
-        <SectionHead title="Applications" lede="Potential applications — an analysis can't guarantee that a causative variant will be found." />
+        <SectionHead title="Applications" lede="Potential applications: an analysis can't guarantee that a causative variant will be found." />
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {APPLICATIONS.map((a) => (
             <li key={a.title} className="rounded-2xl border border-black/[0.06] bg-cream-50/70 p-5 md:p-6">
@@ -319,7 +319,7 @@ export default function WesPage() {
           <div>
             <div className="kicker mb-2 text-ink">Scope &amp; limitations</div>
             <p className="text-ink-soft text-[0.92rem] leading-[1.6]">
-              We analyse sequencing data generated elsewhere — we do not operate a sequencing laboratory. This is a research
+              We analyse sequencing data generated elsewhere; we do not operate a sequencing laboratory. This is a research
               service, not a diagnostic test, and interpretation depends on the quality and coverage of the data supplied.
             </p>
           </div>

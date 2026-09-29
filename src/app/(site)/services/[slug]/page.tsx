@@ -36,7 +36,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   return {
     title: service.title,
     description: service.summary,
-    openGraph: { title: `${service.title} — IndiskaAI`, description: service.summary, type: "article" },
+    openGraph: { title: `${service.title} - IndiskaAI`, description: service.summary, type: "article" },
   };
 }
 

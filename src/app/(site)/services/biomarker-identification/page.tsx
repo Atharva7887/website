@@ -387,7 +387,7 @@ export default function BiomarkerPage() {
         </div>
 
         <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-          <StageColumn title="Stage 1 — inside the platform · RNA-seq pipeline" steps={STAGE_1} tint="navy" />
+          <StageColumn title="Stage 1 · inside the platform · RNA-seq pipeline" steps={STAGE_1} tint="navy" />
           <StageColumn title="Stage 2 · Expression analysis" steps={STAGE_2} tint="navy" />
           <StageColumn title="Stage 3 · Biomarker modelling" steps={STAGE_3} tint="gold" />
         </div>
@@ -398,9 +398,9 @@ export default function BiomarkerPage() {
         </div>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-[0.9rem] leading-[1.5] text-ink-soft">
-          <p><span className="font-medium text-ink">RNA-seq pipeline —</span> raw reads are checked, mapped and counted into a clean gene expression matrix.</p>
-          <p><span className="font-medium text-ink">Expression analysis —</span> genes that differ between groups are found and placed in their biological context.</p>
-          <p><span className="font-medium text-ink">Biomarker modelling —</span> those genes are tested against survival and narrowed to a small, independent signature.</p>
+          <p><span className="font-medium text-ink">RNA-seq pipeline:</span> raw reads are checked, mapped and counted into a clean gene expression matrix.</p>
+          <p><span className="font-medium text-ink">Expression analysis:</span> genes that differ between groups are found and placed in their biological context.</p>
+          <p><span className="font-medium text-ink">Biomarker modelling:</span> those genes are tested against survival and narrowed to a small, independent signature.</p>
         </div>
       </Section>
 

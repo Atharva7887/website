@@ -19,7 +19,7 @@ const SLUG = "genomics/oncology-somatic-variant-analysis";
 export const metadata: Metadata = {
   title: "Oncology: Somatic Variant Analysis",
   description:
-    "Bioinformatics analysis of targeted tumour panel sequencing data — from raw FASTQ to an annotated, tiered somatic variant report with allele fractions and supporting evidence, for review by qualified clinical professionals.",
+    "Bioinformatics analysis of targeted tumour panel sequencing data, from raw FASTQ to an annotated, tiered somatic variant report with allele fractions and supporting evidence, for review by qualified clinical professionals.",
 };
 
 /*
@@ -52,7 +52,7 @@ const PIPELINE: PipelineStep[] = [
 const ANALYSES: { name: string; body: string; art: IllustrationName; chain: string[]; note?: string }[] = [
   {
     name: "Screening Analysis",
-    body: "Focused screening of tumour panel data for a defined set of potentially actionable alterations, such as hotspot variants in EGFR, KRAS and BRAF — with the option to extend to broader analysis on the same data.",
+    body: "Focused screening of tumour panel data for a defined set of potentially actionable alterations, such as hotspot variants in EGFR, KRAS and BRAF, with the option to extend to broader analysis on the same data.",
     art: "hotspotScreening",
     chain: ["FASTQ", "Targeted hotspots", "Focused result"],
   },
@@ -61,7 +61,7 @@ const ANALYSES: { name: string; body: string; art: IllustrationName; chain: stri
     body: "For tumour data without a matched normal. Population databases, panels of normals and other filters help separate likely somatic from inherited variation, with the basis of each call documented.",
     art: "tumourOnly",
     chain: ["FASTQ", "Filtering / annotation", "Likely somatic calls"],
-    note: "Calls are likely somatic — inferred, not experimentally confirmed.",
+    note: "Calls are likely somatic: inferred, not experimentally confirmed.",
   },
   {
     name: "Tumour–Normal Paired Analysis",
@@ -142,7 +142,7 @@ export default function OncologyPage() {
         crumbs={[{ label: "Services", href: "/services" }, { label: "Genomics", href: "/services/genomics" }, { label: "Oncology" }]}
         eyebrow="Genomics · Oncology"
         title="Oncology: Somatic Variant Analysis"
-        lede="Bioinformatics analysis of tumour panel sequencing data — from raw FASTQ files to a clinically annotated, tiered variant report."
+        lede="Bioinformatics analysis of tumour panel sequencing data, from raw FASTQ files to a clinically annotated, tiered variant report."
         cta={
           <>
             <a href="#request" className="cta">
@@ -179,18 +179,18 @@ export default function OncologyPage() {
             </p>
             <p className="mt-4 text-ink-soft text-[0.98rem] leading-[1.6] max-w-[52ch]">
               It identifies alterations acquired by the tumour across the genes the panel covers, and reports each with the
-              evidence behind it — to support review by clinicians and molecular tumour boards.
+              evidence behind it, to support review by clinicians and molecular tumour boards.
             </p>
           </div>
           <div className="lg:col-span-6 space-y-5">
             <div className="rounded-2xl border border-black/[0.06] bg-cream-50 p-5 md:p-6">
-              <div className="kicker mb-3">Genes a panel may cover — examples</div>
+              <div className="kicker mb-3">Genes a panel may cover: examples</div>
               <ul className="flex flex-wrap gap-2">
                 {EXAMPLE_GENES.map((g) => (
                   <li key={g} className="rounded-lg border border-navy/15 bg-navy/[0.05] px-3 py-1.5 font-mono text-[0.9rem] text-navy">{g}</li>
                 ))}
               </ul>
-              <p className="mt-3 text-[0.8rem] text-ink-muted">Examples only — gene content depends on the panel used.</p>
+              <p className="mt-3 text-[0.8rem] text-ink-muted">Examples only; gene content depends on the panel used.</p>
             </div>
             <div className="rounded-2xl border border-black/[0.06] bg-cream-50 p-5 md:p-6">
               <div className="kicker mb-3">Each reported variant carries</div>
@@ -209,7 +209,7 @@ export default function OncologyPage() {
 
       {/* Variant types, shown rather than listed. */}
       <Section band="tint">
-        <SectionHead title="Variant types" lede="What a tumour panel analysis looks for — where the panel design supports it." />
+        <SectionHead title="Variant types" lede="What a tumour panel analysis looks for, where the panel design supports it." />
         <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
           {VARIANT_TYPES.map((v) => (
             <li key={v.title} className="flex flex-col rounded-2xl border border-black/[0.06] bg-cream-50 p-5 md:p-6">

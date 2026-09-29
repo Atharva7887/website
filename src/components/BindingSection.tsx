@@ -41,21 +41,21 @@ export default function BindingSection() {
 
   const beats = [
     {
-      step: "Step 01 — Apart",
+      step: "Step 01: Apart",
       kickerClass: "text-navy",
       opacity: beat1Opacity,
       title: <>An antigen and a candidate antibody, in solution.</>,
-      body: "Two structures, ten thousand possible orientations. Brute-force docking can't see the right one — it has to be reasoned about.",
+      body: "Two structures, ten thousand possible orientations. Brute-force docking can't see the right one; it has to be reasoned about.",
     },
     {
-      step: "Step 02 — Approach",
+      step: "Step 02: Approach",
       kickerClass: "text-navy",
       opacity: beat2Opacity,
       title: <>Our models predict the productive trajectory.</>,
-      body: "Structural priors plus learned interaction potentials yield the pose, the interface residues, and a calibrated affinity estimate — before any wet-lab spend.",
+      body: "Structural priors plus learned interaction potentials yield the pose, the interface residues, and a calibrated affinity estimate, before any wet-lab spend.",
     },
     {
-      step: "Step 03 — Bound",
+      step: "Step 03: Bound",
       kickerClass: "text-gold-700",
       opacity: beat3Opacity,
       title: (

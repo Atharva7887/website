@@ -147,7 +147,7 @@ export type ServiceEntry = {
 };
 
 const STANDARD_START: ServiceStep[] = [
-  { title: "Share your starting point", body: "Target, structures, sequences, or data — whatever you already have.", glyph: "share" },
+  { title: "Share your starting point", body: "Target, structures, sequences, or data, whatever you already have.", glyph: "share" },
   { title: "Define the question", body: "We agree what decision the analysis needs to inform.", glyph: "objective" },
   { title: "Receive decision-ready outputs", body: "Results, figures, and a report stating what they do and don't show.", glyph: "report" },
 ];
@@ -174,7 +174,7 @@ export const SERVICES: ServiceEntry[] = [
       ],
     },
     significanceLabel: "Why libraries matter",
-    significance: "The library is the search space — its diversity sets the ceiling on what any screen can find.",
+    significance: "The library is the search space: its diversity sets the ceiling on what any screen can find.",
     flowLabel: "From diversity to leads",
     flow: [
       { title: "Sequence diversity", body: "Designed variation across the CDRs.", art: "libraryDiversity", glyph: "library" },
@@ -192,7 +192,7 @@ export const SERVICES: ServiceEntry[] = [
         media: "iggVariable",
         kicker: "On a real antibody",
         title: "Diversity lives at the tips.",
-        body: "Library variation is designed into the variable domains — gold here — where the antibody meets its antigen. The constant regions stay fixed.",
+        body: "Library variation is designed into the variable domains, gold here, where the antibody meets its antigen. The constant regions stay fixed.",
       },
     ],
     layout: ["intro", "real", "flow", "gettingStarted", "note"],
@@ -258,7 +258,7 @@ export const SERVICES: ServiceEntry[] = [
     description:
       "Sequence data, computational analysis, and ranking delivered as one package. Built to complement experimental workflows, not replace them.",
     significanceLabel: "Why packages",
-    significance: "A ranking is only useful when the criteria behind it are explicit — so they ship with the data.",
+    significance: "A ranking is only useful when the criteria behind it are explicit, so they ship with the data.",
     flowLabel: "What a package contains",
     flow: [
       { title: "Sequence data", body: "Curated antibody sequences in scope.", glyph: "sequence" },
@@ -283,7 +283,7 @@ export const SERVICES: ServiceEntry[] = [
     group: "computational",
     art: "sequenceToStructure",
     artDescription: "A residue sequence folding into an alpha-helical structure",
-    summary: "Sequence to structure to interaction — a staged workflow.",
+    summary: "Sequence to structure to interaction: a staged workflow.",
     description:
       "A staged pipeline, not one technique. Each stage answers something the previous one cannot, and each carries its own assumptions.",
     significanceLabel: "Why stages matter",
@@ -326,11 +326,11 @@ export const SERVICES: ServiceEntry[] = [
         media: "fabLysozyme",
         kicker: "What interaction analysis shows",
         title: "The interface, residue by residue.",
-        body: "On this antibody–lysozyme complex, every residue within 4.5 Å of the partner is gold — the epitope on one side, the paratope on the other. This is the level our interaction tables report.",
+        body: "On this antibody–lysozyme complex, every residue within 4.5 Å of the partner is gold: the epitope on one side, the paratope on the other. This is the level our interaction tables report.",
       },
     ],
     layout: ["flow", "intro", "real", "io", "applications", "note"],
-    note: "Prediction produces candidate models; docking and MD ask different questions of them. Neither establishes biological truth on its own — results are computational evidence for experimental follow-up.",
+    note: "Prediction produces candidate models; docking and MD ask different questions of them. Neither establishes biological truth on its own; results are computational evidence for experimental follow-up.",
     ctaLabel: "Talk to our computational biology team",
   },
   {
@@ -343,7 +343,7 @@ export const SERVICES: ServiceEntry[] = [
     artDescription: "Two protein surfaces meeting along a complementary interface with contact points marked",
     summary: "Candidate binding poses and interface maps, ranked and explained.",
     description:
-      "Structure-based docking to predict candidate binding poses and characterise interfaces. It generates and ranks structural hypotheses — not evidence that binding occurs.",
+      "Structure-based docking to predict candidate binding poses and characterise interfaces. It generates and ranks structural hypotheses, not evidence that binding occurs.",
     heroMedia: "proteaseLigand",
     cardGroups: [
       {
@@ -416,7 +416,7 @@ export const SERVICES: ServiceEntry[] = [
     ],
     faqs: [
       { q: "Is a docking score a binding affinity?", a: "No. Scores rank poses within a run; they are not affinities and shouldn't be compared across systems." },
-      { q: "Can you dock into a predicted structure?", a: "Yes, after assessing model confidence around the site — low-confidence regions are flagged before docking." },
+      { q: "Can you dock into a predicted structure?", a: "Yes, after assessing model confidence around the site; low-confidence regions are flagged before docking." },
       { q: "When should MD follow docking?", a: "When the decision depends on whether a pose is maintained, or when several poses score similarly." },
     ],
     layout: ["cards:analyse", "cards:types", "workflow", "closingFlow", "io", "applications", "faq", "note"],
@@ -439,7 +439,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         id: "questions",
         label: "Questions we answer",
-        lede: "Analytical questions about the simulated system — not guaranteed outcomes.",
+        lede: "Analytical questions about the simulated system, not guaranteed outcomes.",
         variant: "glyph",
         cards: [
           { title: "Is the pose stable?", body: "Is the starting arrangement maintained, or does it drift?", glyph: "stable" },
@@ -486,7 +486,7 @@ export const SERVICES: ServiceEntry[] = [
         artCaption: "Illustrative MD simulation: thermal fluctuation of the whole chain, with one domain swinging about the gold hinge loop. Drag to turn.",
         kicker: "Conformational dynamics",
         title: "Protein Stability & Conformational Dynamics",
-        body: "A crystal or docked structure is one snapshot. Over a trajectory the same protein flexes, rearranges and moves between conformational states — which MD resolves and quantifies.",
+        body: "A crystal or docked structure is one snapshot. Over a trajectory the same protein flexes, rearranges and moves between conformational states, which MD resolves and quantifies.",
       },
     ],
     workflowLabel: "End-to-end MD package",
@@ -517,7 +517,7 @@ export const SERVICES: ServiceEntry[] = [
       { title: "Energetic analysis, where applicable", glyph: "energy" },
       { title: "Final report", glyph: "report" },
     ],
-    faqTitle: "Frequently Asked Questions — Molecular Dynamics Simulation",
+    faqTitle: "Frequently Asked Questions: Molecular Dynamics Simulation",
     faqs: [
       {
         q: "What is Molecular Dynamics (MD) simulation?",
@@ -544,24 +544,24 @@ export const SERVICES: ServiceEntry[] = [
   {
     slug: "genomics",
     title: "Genomics",
-    navLabel: "Genomics — Whole Exome Sequencing",
+    navLabel: "Genomics · Whole Exome Sequencing",
     group: "computational",
     custom: true,
     art: "exomeCapture",
     artDescription: "Exons captured from a genome, sequenced as reads, with a variant marked",
-    summary: "Whole exome sequencing analysis — raw FASTQ to an annotated, classified variant report.",
+    summary: "Whole exome sequencing analysis: raw FASTQ to an annotated, classified variant report.",
     description: "Bioinformatics analysis of exome sequencing data, from raw reads to a classified variant report.",
     ctaLabel: "Request analysis",
   },
   {
     slug: "genomics/oncology-somatic-variant-analysis",
     title: "Oncology: Somatic Variant Analysis",
-    navLabel: "Genomics — Oncology: Somatic Variants",
+    navLabel: "Genomics · Oncology: Somatic Variants",
     group: "computational",
     custom: true,
     art: "tumourPanel",
     artDescription: "A tumour sample, targeted panel regions, and sequencing reads with somatic variant positions marked",
-    summary: "Tumour panel sequencing analysis — raw FASTQ to an annotated, tiered variant report.",
+    summary: "Tumour panel sequencing analysis: raw FASTQ to an annotated, tiered variant report.",
     description: "Bioinformatics analysis of targeted oncology panel data, returning prioritised somatic variants with allele fractions and supporting evidence.",
     ctaLabel: "Request analysis",
   },
@@ -586,7 +586,7 @@ export const SERVICES: ServiceEntry[] = [
     artDescription: "A branching research workflow with parallel tracks converging on a single outcome",
     summary: "Customised research and development across antibody engineering.",
     description:
-      "Research strategies built around your targets, formats, and development challenges — from early concept through characterisation and optimisation.",
+      "Research strategies built around your targets, formats, and development challenges, from early concept through characterisation and optimisation.",
     significanceLabel: "Why a programme",
     significance: "Hard problems rarely fit one service; the strategy that connects the methods matters most.",
     flowLabel: "How an engagement runs",
@@ -617,7 +617,7 @@ export const SERVICES: ServiceEntry[] = [
       frames: [
         { art: "researchWorkflow", title: "Discovery inputs", caption: "Candidates from our pipelines or your own programme." },
         { art: "leadOptimization", title: "Optimisation", caption: "Targeted iteration on liabilities and stability." },
-        { art: "developmentPipeline", title: "Handoff", caption: "A shortlist with the evidence — and gaps — stated." },
+        { art: "developmentPipeline", title: "Handoff", caption: "A shortlist with the evidence, and gaps, stated." },
       ],
     },
     significanceLabel: "From design to development",

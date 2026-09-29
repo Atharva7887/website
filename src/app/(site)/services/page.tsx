@@ -9,7 +9,7 @@ import { SERVICE_GROUPS, servicesInGroup, getService } from "@/lib/services-data
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "AI-assisted antibody libraries, antibody discovery, structural analysis, molecular docking, molecular dynamics, genomics, biomarker discovery, and product development — the services IndiskaAI offers biopharma and biotechnology partners.",
+    "AI-assisted antibody libraries, antibody discovery, structural analysis, molecular docking, molecular dynamics, genomics, biomarker discovery, and product development: the services IndiskaAI offers biopharma and biotechnology partners.",
 };
 
 /** Where each service sits along a discovery programme. */
@@ -39,7 +39,7 @@ export default function ServicesPage() {
             Antibody discovery, <span className="italic text-navy">engineered.</span>
           </>
         }
-        lede="Libraries, discovery, structural science, genomics, and development — as a pipeline or a standalone engagement."
+        lede="Libraries, discovery, structural science, genomics, and development, as a pipeline or a standalone engagement."
         cta={
           <Link href="/partner" className="cta">
             Partner with us
@@ -69,7 +69,7 @@ export default function ServicesPage() {
               <h2 className="font-display text-[clamp(1.5rem,3vw,2.2rem)] leading-[1.05] tracking-tightest text-ink">
                 Where each service fits
               </h2>
-              <p className="text-ink-muted text-[0.88rem] md:max-w-[36ch]">Start at any stage — most programmes use two or three.</p>
+              <p className="text-ink-muted text-[0.88rem] md:max-w-[36ch]">Start at any stage, most programmes use two or three.</p>
             </div>
             <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-4">
               {STAGES.map((stage, i) => (

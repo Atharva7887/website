@@ -42,7 +42,7 @@ Pages follow SHOW → EXPLAIN → GUIDE: one-sentence copy, every card/step carr
 **Re-enable:** Uncomment the import and `<BindingSection />` placement in `src/app/(site)/page.tsx` (placed between Capabilities and the divider before Approach).
 **State at pause:**
 - 320vh sticky scroll-scrubbed section, antigen + antibody dock vertically (y +3.5 → +0.2 and -3.5 → -0.2) and meet centered around y = 0.
-- Lock + glow timing aligned to "Step 03 — Bound" reaching ~50% opacity (scrollYProgress ≈ 0.66).
+- Lock + glow timing aligned to "Step 03: Bound" reaching ~50% opacity (scrollYProgress ≈ 0.66).
 - Responsive x-shift via `useThree().viewport.aspect` so the complex sits on viewport-right on landscape, centered on portrait.
 - Geometries already optimized (low-poly icosahedrons, flatShading, reduced cylinder segments).
 **Open considerations before re-enabling:**

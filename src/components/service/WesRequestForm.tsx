@@ -122,7 +122,7 @@ export default function WesRequestForm({
 
       <div>
         <Label htmlFor={f("message")}>How can we help you?</Label>
-        <textarea id={f("message")} name="message" rows={4} placeholder="Panel or assay, sample types, and what you need from the analysis — no patient details." className={`${input} resize-y`} />
+        <textarea id={f("message")} name="message" rows={4} placeholder="Panel or assay, sample types, and what you need from the analysis, no patient details." className={`${input} resize-y`} />
       </div>
 
       <label className="flex items-start gap-3 text-[0.88rem] leading-[1.5] text-ink">
