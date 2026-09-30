@@ -152,11 +152,30 @@ export default async function TeamPage() {
             <span className="italic text-navy">first-principles thinkers.</span>
           </>
         }
-        lede="A small team holding ambitious ground. We're growing, and most of the people who will shape this company haven't joined yet."
+        lede="A small team of data scientists, bioinformaticians, and engineers holding ambitious ground. We're growing, and most of the people who will shape this company haven't joined yet."
       />
 
       <section className="py-10 md:py-14">
         <FounderSpotlight />
+      </section>
+
+      {/* Team photo — sits right under Leadership. No crop container: the
+          photo's own soft vignette edge is the border, so boxing it in a
+          rounded-rect would just re-introduce a hard edge. */}
+      <section className="pb-12 md:pb-20">
+        <div className="mx-auto max-w-[1400px] px-6 md:px-10">
+          <div className="relative mx-auto w-full max-w-[900px]">
+            <Image
+              src="/team/indiskaai-team.webp"
+              alt="The IndiskaAI team"
+              width={1448}
+              height={1086}
+              sizes="(max-width: 1024px) 90vw, 900px"
+              className="w-full h-auto"
+              priority
+            />
+          </div>
+        </div>
       </section>
 
       <section className="py-12 md:py-20">
