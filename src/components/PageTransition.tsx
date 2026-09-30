@@ -12,7 +12,7 @@ export default function PageTransition({
 
   return (
     <AnimatePresence mode="wait">
-      <motion.main
+      <motion.div
         key={pathname}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -21,7 +21,7 @@ export default function PageTransition({
         className="flex-grow w-full"
       >
         {children}
-      </motion.main>
+      </motion.div>
     </AnimatePresence>
   );
 }

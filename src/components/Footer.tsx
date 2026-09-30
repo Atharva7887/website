@@ -192,9 +192,8 @@ export default function Footer({
             />
             <span>&copy; {new Date().getFullYear()} IndiskaAI. All rights reserved.</span>
           </div>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-cream-100 transition-colors duration-300">Privacy</a>
-            <a href="#" className="hover:text-cream-100 transition-colors duration-300">Terms</a>
+          <div className="text-cream-100/55">
+            Privacy and terms available on request
           </div>
         </motion.div>
       </div>

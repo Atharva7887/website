@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-type Stage = "idle" | "submitting" | "success";
+type Stage = "idle" | "submitting" | "success" | "error";
 
 const interests = [
   "Target engagement",
@@ -28,12 +28,35 @@ export default function PartnerForm({
   const [stage, setStage] = useState<Stage>("idle");
   const [interest, setInterest] = useState(interests[0]);
   const [pipelineStage, setPipelineStage] = useState(stages[0]);
+  const [error, setError] = useState("");
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStage("submitting");
-    // Placeholder: real submission would hit an API route or form provider.
-    setTimeout(() => setStage("success"), 900);
+    setError("");
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const payload = Object.fromEntries(data.entries());
+
+    try {
+      const response = await fetch("/api/partner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(result.error || "We could not send your request.");
+      setStage("success");
+      form.reset();
+    } catch (submissionError) {
+      setStage("error");
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "We could not send your request."
+      );
+    }
   }
 
   if (stage === "success") {
@@ -122,9 +145,15 @@ export default function PartnerForm({
           id="message"
           name="message"
           rows={5}
+          maxLength={5000}
           className="w-full bg-cream-100 border border-black/10 rounded-lg px-4 py-3 text-ink placeholder-ink-muted/60 outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:border-navy/60 transition-colors resize-none"
           placeholder="Target, modality, timeline, or anything else you want us to know."
         />
+      </div>
+
+      <div className="sr-only" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" tabIndex={-1} autoComplete="off" />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
@@ -140,6 +169,12 @@ export default function PartnerForm({
           <span className="cta-arrow">→</span>
         </button>
       </div>
+
+      {stage === "error" && (
+        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          {error} You can also email <a className="underline" href={`mailto:${contactEmail}`}>{contactEmail}</a> directly.
+        </p>
+      )}
     </form>
   );
 }
@@ -180,6 +215,7 @@ function Field({
         name={id}
         type={type}
         required={required}
+        maxLength={160}
         className="w-full bg-cream-100 border border-black/10 rounded-lg px-4 py-3 text-ink placeholder-ink-muted/60 outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:border-navy/60 transition-colors"
       />
     </div>
