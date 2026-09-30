@@ -61,7 +61,19 @@ const links: NavLink[] = [
     ],
     viewAllLabel: "About IndiskaAI",
   },
-  { label: "Research", href: "/research" },
+  {
+    label: "Research",
+    href: "/research",
+    groups: [
+      {
+        items: [
+          { label: "Blog", href: "/blog" },
+          { label: "Latest Updates", href: "/updates" },
+        ],
+      },
+    ],
+    viewAllLabel: "All research",
+  },
   { label: "Careers", href: "/careers" },
 ];
 
@@ -259,7 +271,7 @@ export default function Nav({ careersStatus }: { careersStatus?: string }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="lg:hidden border-t border-black/5 bg-cream-100/95 backdrop-blur-md origin-top max-h-[calc(100svh-4.5rem)] overflow-y-auto"
+            className="lg:hidden border-t border-black/5 bg-cream-100/95 backdrop-blur-md origin-top h-[calc(100svh-4.5rem)] overflow-y-auto"
           >
             <motion.ul
               className="px-6 py-6 flex flex-col gap-4"

@@ -19,6 +19,8 @@ const routes: { path: string; priority: number; changeFrequency: MetadataRoute.S
     changeFrequency: "monthly" as const,
   })),
   { path: "/research", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/blog", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/updates", priority: 0.6, changeFrequency: "weekly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/team", priority: 0.8, changeFrequency: "monthly" },
   { path: "/future", priority: 0.7, changeFrequency: "monthly" },
